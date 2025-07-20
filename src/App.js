@@ -88,32 +88,6 @@ function App() {
         alert("元の調査テンプレートが見つかりませんでした。");
     }
   };
-  
-  const fetchAdminData = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        alert('トークンがありません。');
-        return;
-    }
-    try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin-data`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            alert(`エラー: ${data.message}`);
-        } else {
-            alert(`サーバーからの返信: ${data.message}`);
-        }
-    } catch (error) {
-        alert('APIの呼び出しに失敗しました。');
-        console.error(error);
-    }
-  };
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -148,12 +122,6 @@ function App() {
          <span>ようこそ {user.name}さん ({user.role})</span>
          <button onClick={handleLogout} className="mode-button back-button">ログアウト</button>
        </header>
-       
-       {(user.role === 'master' || user.role === 'super') && (
-            <button onClick={fetchAdminData} className="mode-button action-button" style={{margin: '10px'}}>
-                管理者用データを取得(テスト)
-            </button>
-        )}
       {renderScreen()}
     </div>
   );
