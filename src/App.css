@@ -584,3 +584,47 @@
     color: white;
     width: 100%;
 }
+
+/* この部分をApp.cssの一番下に追加 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  flex-shrink: 0; /* ヘッダーが縮まないようにする */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.camera-button {
+    margin: 0;
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: #00aaff;
+}
+
+.app-main {
+  flex-grow: 1; /* メインコンテンツが残りの高さをすべて使う */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* App.js直下の .App クラスは不要になるため削除または修正 */
+.App {
+  /* このクラスの justify-content や align-items は app-main に移譲 */
+  width: 100%;
+}
