@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const DataManagementScreen = ({ onBack, onEdit }) => { // ---【追加】onEditを受け取る
-  const [mode, setMode] = useState('surveys'); 
+const DataManagementScreen = ({ onBack, onEdit }) => {
+  const [mode, setMode] = useState('surveys'); // 'surveys', 'presets', 'results'
   const [items, setItems] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -13,7 +13,20 @@ const DataManagementScreen = ({ onBack, onEdit }) => { // ---【追加】onEdit�
         return;
       }
       
-      const endpoint = mode === 'surveys' ? '/api/surveys' : '/api/presets';
+      let endpoint = '';
+      switch (mode) {
+        case 'surveys':
+            endpoint = '/api/surveys';
+            break;
+        case 'presets':
+            endpoint = '/api/presets';
+            break;
+        case 'results':
+            endpoint = '/api/results/all';
+            break;
+        default:
+            return;
+      }
 
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}${endpoint}`, {
@@ -46,18 +59,31 @@ const DataManagementScreen = ({ onBack, onEdit }) => { // ---【追加】onEdit�
 
   const handleDelete = async () => {
     if (selectedIds.length === 0) {
-      alert(`削除する${mode === 'surveys' ? '調査テンプレート' : 'プリセット'}を選択してください。`);
+      alert(`削除する項目を選択してください。`);
       return;
     }
 
-    if (window.confirm(`選択した ${selectedIds.length} 件の${mode === 'surveys' ? '調査テンプレート' : 'プリセット'}を本当に削除しますか？`)) {
+    if (window.confirm(`選択した ${selectedIds.length} 件の項目を本当に削除しますか？`)) {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('認証エラー。再ログインしてください。');
         return;
       }
       
-      const endpoint = mode === 'surveys' ? '/api/surveys' : '/api/presets';
+      let endpoint = '';
+      switch (mode) {
+        case 'surveys':
+            endpoint = '/api/surveys';
+            break;
+        case 'presets':
+            endpoint = '/api/presets';
+            break;
+        case 'results':
+            endpoint = '/api/results';
+            break;
+        default:
+            return;
+      }
 
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}${endpoint}`, {
@@ -87,6 +113,15 @@ const DataManagementScreen = ({ onBack, onEdit }) => { // ---【追加】onEdit�
     }
   };
 
+  const getModeTitle = () => {
+    switch(mode) {
+        case 'surveys': return '調査テンプレート';
+        case 'presets': return 'プリセット';
+        case 'results': return '調査結果';
+        default: return '';
+    }
+  }
+
   return (
     <div className="data-management-container">
       <div className="mode-toggle">
@@ -102,6 +137,12 @@ const DataManagementScreen = ({ onBack, onEdit }) => { // ---【追加】onEdit�
         >
           プリセット
         </button>
+        <button
+          className={`toggle-button ${mode === 'results' ? 'active' : ''}`}
+          onClick={() => setMode('results')}
+        >
+          調査結果
+        </button>
       </div>
 
       <div className="data-list">
@@ -114,8 +155,10 @@ const DataManagementScreen = ({ onBack, onEdit }) => { // ---【追加】onEdit�
             />
             <span className="data-name">{item.name}</span>
             <span className="data-date">作成日: {new Date(item.createdAt).toLocaleDateString()}</span>
-            {/* ---【追加】編集ボタン --- */}
-            <button className="mode-button edit-button" onClick={() => onEdit(mode, item)}>編集</button>
+            {/* 調査結果には編集ボタンを表示しない */}
+            {mode !== 'results' && 
+                <button className="mode-button edit-button" onClick={() => onEdit(mode, item)}>編集</button>
+            }
           </div>
         ))}
       </div>
