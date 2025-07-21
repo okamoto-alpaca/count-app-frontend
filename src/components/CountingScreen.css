@@ -59,3 +59,13 @@
 .grid-item-button .count-number {
     font-size: 20px;
 }
+
+/* ---【ここから変更】--- */
+
+.real-work-button { border-color: #007bff; color: #007bff; background-color: #e7f3ff; }
+.incidental-work-button { border-color: #ffc107; color: #b88a00; background-color: #fff8e1; }
+.wasteful-work-button { border-color: #dc3545; color: #dc3545; background-color: #fdecea; }
+
+.real-work-button:hover { background-color: #007bff; color: white; }
+.incidental-work-button:hover { background-color: #ffc107; color: white; }
+.wasteful-work-button:hover { background-color: #dc3545; color: white; }

@@ -16,7 +16,7 @@
 }
 
 .mode-button {
-  background-color: #00aaff; /* 明るい青 */
+  background-color: #00aaff;
   color: white;
   border: none;
   padding: 20px;
@@ -30,11 +30,10 @@
 }
 
 .mode-button:hover {
-  transform: translateY(-2px); /* 少し浮き上がる */
+  transform: translateY(-2px);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .screen-container {
   display: flex;
   flex-direction: column;
@@ -44,7 +43,6 @@
   color: #333;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .form-container {
   width: 90%;
   max-width: 700px;
@@ -64,7 +62,7 @@
 
 .input-group {
   display: flex;
-  gap: 15px; /*入力欄の間隔*/
+  gap: 15px;
   margin-bottom: 25px;
 }
 
@@ -94,12 +92,10 @@
 .work-category-box input {
   margin-bottom: 10px;
 }
-/* 最後の子要素のマージンを削除 */
 .work-category-box input:last-child {
   margin-bottom: 0;
 }
 
-/* 計画書に合わせた色分け */
 .real-work { background-color: #0082d8; }
 .incidental-work { background-color: #f7b500; }
 .wasteful-work { background-color: #e53935; }
@@ -112,14 +108,13 @@
 }
 
 .action-button {
-  background-color: #4caf50; /* 緑色 */
+  background-color: #4caf50;
 }
 
 .back-button {
-  background-color: #6c757d; /* グレー */
+  background-color: #6c757d;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .list-item {
   display: flex;
   align-items: center;
@@ -129,12 +124,12 @@
 
 .delete-button {
   padding: 10px 15px;
-  background-color: #f44336; /* 赤色 */
+  background-color: #f44336;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  flex-shrink: 0; /* ボタンが縮まないようにする */
+  flex-shrink: 0;
 }
 
 .delete-button:hover {
@@ -156,7 +151,6 @@
   background-color: #333;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .survey-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -184,7 +178,6 @@
   border-color: #00aaff;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .counting-container {
   width: 100%;
   min-height: 100vh;
@@ -226,7 +219,6 @@
   margin-top: 0;
 }
 
-/* 計画書に合わせたヘッダー色分け */
 .real-work-header { background-color: #007bff; }
 .incidental-work-header { background-color: #ffc107; }
 .wasteful-work-header { background-color: #dc3545; }
@@ -257,7 +249,8 @@
   font-weight: bold;
 }
 
-/* 計画書に合わせたボタン色分け */
+/* ---【ここから変更】--- */
+
 .real-work-button { border-color: #007bff; color: #007bff; background-color: #e7f3ff; }
 .incidental-work-button { border-color: #ffc107; color: #b88a00; background-color: #fff8e1; }
 .wasteful-work-button { border-color: #dc3545; color: #dc3545; background-color: #fdecea; }
@@ -269,6 +262,7 @@
 .incidental-work-button:hover { background-color: #ffc107; }
 .wasteful-work-button:hover { background-color: #dc3545; }
 
+
 .counting-footer {
   background-color: #f8f9fa;
   padding: 15px;
@@ -278,7 +272,6 @@
   gap: 20px;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .results-container {
   width: 90%;
   max-width: 800px;
@@ -336,7 +329,6 @@
   background-color: #e9ecef;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .summary-container {
   width: 100%;
   max-width: 800px;
@@ -397,7 +389,6 @@
   border-top: 1px solid #eee;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .period-form {
   display: flex;
   align-items: center;
@@ -408,12 +399,12 @@
 }
 .period-table-container {
   margin-top: 20px;
-  overflow-x: auto; /* テーブルが横に長い場合スクロールできるようにする */
+  overflow-x: auto;
 }
 .period-table {
   width: 100%;
   border-collapse: collapse;
-  white-space: nowrap; /* テーブルの文字が折り返さないようにする */
+  white-space: nowrap;
 }
 .period-table th, .period-table td {
   border: 1px solid #ddd;
@@ -431,7 +422,6 @@
   margin-top: 30px;
 }
 
-/* Add this to the bottom of App.css */
 .search-results {
   margin-top: 20px;
 }
@@ -462,75 +452,6 @@
   font-size: 14px;
 }
 
-.period-form {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.period-form .form-input {
-  margin-bottom: 0;
-}
-
-.period-table-container {
-  margin-top: 20px;
-  overflow-x: auto; /* Allow horizontal scrolling for wide tables */
-}
-
-.period-table {
-  width: 100%;
-  border-collapse: collapse;
-  white-space: nowrap; /* Prevent text wrapping */
-}
-
-.period-table th, .period-table td {
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  text-align: center;
-}
-
-.period-table th {
-  background-color: #f2f2f2;
-}
-
-.period-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-/* この部分をApp.cssの一番下に追加 */
-.period-form {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.period-form .form-input {
-  margin-bottom: 0;
-}
-.period-table-container {
-  margin-top: 20px;
-  overflow-x: auto; /* テーブルが横に長い場合スクロールできるようにする */
-}
-.period-table {
-  width: 100%;
-  border-collapse: collapse;
-  white-space: nowrap; /* テーブルの文字が折り返さないようにする */
-}
-.period-table th, .period-table td {
-  border: 1px solid #ddd;
-  padding: 8px 12px;
-  text-align: center;
-}
-.period-table th {
-  background-color: #f2f2f2;
-}
-.period-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.chart-container {
-  margin-top: 30px;
-}
-
-/* この部分をApp.cssの一番下に追加 */
 .data-management-container {
   width: 100%;
   max-width: 800px;
@@ -586,38 +507,6 @@
   margin-top: 30px;
 }
 
-/* Add this to the bottom of App.css */
-.login-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #f0f2f5;
-}
-
-.login-form {
-  padding: 40px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  max-width: 400px;
-}
-
-.login-form h1 {
-  text-align: center;
-  margin-top: 0;
-  color: #333;
-}
-
-.login-form .action-button {
-  margin-top: 10px;
-}
-
-/* この部分をApp.cssの一番下に追加 */
 .login-container {
   display: flex;
   align-items: center;
@@ -652,18 +541,33 @@
   margin-top: 10px;
 }
 
-/* この部分をApp.cssの一番下に追加 */
+.app-header {
+  width: 100%;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.app-header .back-button {
+  margin: 0;
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
 .data-item .edit-button {
-    margin-left: auto; /* 右端に配置 */
+    margin-left: auto;
     padding: 8px 12px;
     font-size: 14px;
-    background-color: #ffc107; /* 黄色 */
+    background-color: #ffc107;
 }
 .data-item .edit-button:hover {
     background-color: #e0a800;
 }
 
-/* この部分をApp.cssの一番下に追加 */
 .in-progress-section {
     width: 80%;
     max-width: 400px;
@@ -676,14 +580,7 @@
     color: #555;
 }
 .resume-button {
-    background-color: #4caf50; /* 緑 */
+    background-color: #4caf50;
     color: white;
     width: 100%;
-}
-
-/* この部分をApp.cssの一番下に追加 */
-.data-item .data-company-code {
-    margin-left: 15px;
-    font-size: 14px;
-    color: #888;
 }
