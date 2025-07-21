@@ -23,7 +23,8 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
         setCounts(initialCounts);
         setTotalCount(0);
     }
-  }, [instanceId, storageKey, survey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instanceId, storageKey]);
 
 
   const handleCount = (category, item) => {
@@ -55,19 +56,24 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
   ];
 
   return (
-    <div className="counting-container">
-      <div className="counting-header-single-line">
-        <h1>調査: {survey.name}</h1>
-        <h2>カウント合計: {totalCount}</h2>
-        <button 
-            className={`minus-mode-button ${isMinusMode ? 'active' : ''}`}
-            onClick={() => setIsMinusMode(!isMinusMode)}
-        >
-            ー
-        </button>
+    // ---【変更点】CSSクラス名を修正し、構造を変更 ---
+    <div className="counting-container-fixed-header">
+      <div className="counting-header-sticky">
+        <div className="header-info">
+            <h1>調査: {survey.name}</h1>
+            <h2>カウント合計: {totalCount}</h2>
+        </div>
+        <div className="counting-header-actions">
+            <button 
+                className={`minus-mode-button ${isMinusMode ? 'active' : ''}`}
+                onClick={() => setIsMinusMode(!isMinusMode)}
+            >
+                ー
+            </button>
+        </div>
       </div>
 
-      <main className="counting-grid">
+      <main className="counting-grid-scrollable">
         {allItems.map((item, index) => {
             const key = `${item.category}-${item.name}`;
             return (
@@ -83,7 +89,7 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
         })}
       </main>
 
-      <footer className="counting-footer">
+      <footer className="counting-footer-fixed">
         <button className="mode-button action-button" onClick={handleEndSurvey}>調査終了</button>
         <button className="mode-button back-button" onClick={onBack}>調査選択に戻る</button>
       </footer>
