@@ -10,29 +10,38 @@ const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
 
     const fetchTemplatesAndInProgress = async () => {
       try {
-        // テンプレート一覧を取得
         const templatesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/surveys`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const templatesData = await templatesResponse.json();
+
         if (templatesResponse.ok) {
             setSurveyTemplates(templatesData);
 
-            // 進行中の調査を取得
-            const inProgressResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/survey-instances/in-progress`, {
+            // ---【変更点】APIのパスを修正 ---
+            const inProgressResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/surveys/instances/in-progress`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const inProgressData = await inProgressResponse.json();
+            
             if (inProgressResponse.ok) {
                 const populatedInstances = inProgressData.map(instance => {
                     const template = templatesData.find(t => t.id === instance.surveyTemplateId);
                     return { ...instance, name: template ? template.name : '不明な調査' };
                 });
                 setInProgressSurveys(populatedInstances);
+            } else {
+                // エラーレスポンスがJSONでない場合も考慮
+                const errorText = await inProgressResponse.text();
+                throw new Error(inProgressData.message || errorText || '進行中の調査の取得に失敗しました。');
             }
+        } else {
+            const errorData = await templatesResponse.json();
+            throw new Error(errorData.message || '調査リストの取得に失敗しました。');
         }
       } catch (error) {
         console.error("Error fetching data: ", error);
+        alert(error.message);
       }
     };
     
@@ -49,13 +58,13 @@ const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
 
     if (window.confirm(`「${surveyTemplate.name}」の調査を新しく開始しますか？`)) {
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/survey-instances`, {
+            // ---【変更点】APIのパスを修正 ---
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/surveys/instances`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                // ---【変更点】テンプレートの名前も渡す ---
                 body: JSON.stringify({ 
                     surveyTemplateId: surveyTemplate.id,
                     surveyTemplateName: surveyTemplate.name 
