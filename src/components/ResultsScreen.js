@@ -66,7 +66,6 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
     }
   };
 
-  // ---【新機能】調査を破棄する処理 ---
   const handleDiscard = async () => {
     if (window.confirm('この調査を破棄しますか？この操作は元に戻せません。')) {
         const token = localStorage.getItem('token');
@@ -148,7 +147,6 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
         <>
             <div className="form-actions">
                 <button className="mode-button action-button" onClick={handleSaveResults}>今回の結果を保存</button>
-                {/* ---【変更点】onClickイベントにhandleDiscardを割り当て --- */}
                 <button className="mode-button back-button" onClick={handleDiscard}>調査を破棄</button>
             </div>
             <button className="mode-button" onClick={onBack}>カウント画面に戻る</button>
