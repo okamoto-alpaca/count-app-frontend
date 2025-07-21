@@ -1,29 +1,47 @@
 import React, { useState, useEffect } from 'react';
 
-const CountingScreen = ({ survey, onEndSurvey, onBack }) => {
+const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => { // ---【変更点】instanceIdを受け取る
   const [counts, setCounts] = useState({});
   const [totalCount, setTotalCount] = useState(0);
 
-  // ---【変更点】初期化処理を修正 ---
-  useEffect(() => {
-    const initialCounts = {};
-    // 各カテゴリの項目に、カテゴリ名をプレフィックスとして付けて一意なキーを作成
-    survey.realWork.forEach(item => { initialCounts[`real-${item}`] = 0; });
-    survey.incidentalWork.forEach(item => { initialCounts[`incidental-${item}`] = 0; });
-    survey.wastefulWork.forEach(item => { initialCounts[`wasteful-${item}`] = 0; });
-    
-    setCounts(initialCounts);
-    setTotalCount(0);
-  }, [survey]);
+  // ---【変更点】localStorageのキーをインスタンスごとに一意にする ---
+  const storageKey = `survey-progress-${instanceId}`;
 
-  // ---【変更点】カウント処理のキーを一意なものに変更 ---
+  useEffect(() => {
+    // ---【変更点】localStorageから途中経過を読み込む ---
+    const savedProgress = localStorage.getItem(storageKey);
+    if (savedProgress) {
+        const parsedProgress = JSON.parse(savedProgress);
+        setCounts(parsedProgress);
+        // 合計カウントも復元
+        const total = Object.values(parsedProgress).reduce((sum, count) => sum + count, 0);
+        setTotalCount(total);
+    } else {
+        // 保存されたデータがない場合、カウントを初期化
+        const initialCounts = {};
+        survey.realWork.forEach(item => { initialCounts[`real-${item}`] = 0; });
+        survey.incidentalWork.forEach(item => { initialCounts[`incidental-${item}`] = 0; });
+        survey.wastefulWork.forEach(item => { initialCounts[`wasteful-${item}`] = 0; });
+        setCounts(initialCounts);
+        setTotalCount(0);
+    }
+  }, [survey, instanceId, storageKey]); // 依存配列にinstanceIdとstorageKeyを追加
+
   const handleCount = (category, item) => {
-    const key = `${category}-${item}`; // 'real-手作業' のような一意なキーを生成
-    setCounts(prevCounts => ({ ...prevCounts, [key]: prevCounts[key] + 1 }));
+    const key = `${category}-${item}`;
+    const newCounts = { ...counts, [key]: (counts[key] || 0) + 1 };
+    setCounts(newCounts);
     setTotalCount(prevTotal => prevTotal + 1);
+    // ---【変更点】カウントのたびにlocalStorageに保存 ---
+    localStorage.setItem(storageKey, JSON.stringify(newCounts));
   };
 
-  // ---【追加】各カテゴリのボタンをレンダリングするヘルパー関数 ---
+  const handleEndSurvey = () => {
+    // ---【変更点】調査終了時にlocalStorageのデータを削除 ---
+    localStorage.removeItem(storageKey);
+    onEndSurvey(counts);
+  };
+
   const renderCountButtons = (category, items, buttonClass) => {
     return items.map((item, index) => {
         const key = `${category}-${item}`;
@@ -46,7 +64,6 @@ const CountingScreen = ({ survey, onEndSurvey, onBack }) => {
         <section className="count-category">
           <h3 className="real-work-header">実作業</h3>
           <div className="count-grid">
-            {/* ---【変更点】ヘルパー関数を使ってボタンを表示 --- */}
             {renderCountButtons('real', survey.realWork, 'real-work-button')}
           </div>
         </section>
@@ -64,7 +81,7 @@ const CountingScreen = ({ survey, onEndSurvey, onBack }) => {
         </section>
       </main>
       <footer className="counting-footer">
-        <button className="mode-button action-button" onClick={() => onEndSurvey(counts)}>調査終了</button>
+        <button className="mode-button action-button" onClick={handleEndSurvey}>調査終了</button>
         <button className="mode-button back-button" onClick={onBack}>調査選択に戻る</button>
       </footer>
     </div>

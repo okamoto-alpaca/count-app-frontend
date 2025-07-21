@@ -21,10 +21,8 @@ function App() {
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [surveyResults, setSurveyResults] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // ---【追加】編集対象のデータを保持するstate ---
   const [editingItem, setEditingItem] = useState(null);
-
+  const [activeInstanceId, setActiveInstanceId] = useState(null); // ---【追加】---
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -94,38 +92,39 @@ function App() {
     }
   };
 
-  // ---【追加】編集ボタンが押されたときの処理 ---
   const handleEdit = (mode, item) => {
     setEditingItem(item);
-    // modeが 'surveys' なら 'register'画面へ、'presets' なら 'preset'画面へ遷移
     setCurrentScreen(mode === 'surveys' ? 'register' : 'preset');
   };
 
-  // ---【追加】登録・編集画面から戻るときの処理 ---
   const handleBackFromForm = () => {
-    setEditingItem(null); // 編集データをクリア
+    setEditingItem(null);
     setCurrentScreen('main');
+  };
+
+  // ---【追加】調査選択時の処理を更新 ---
+  const handleSelectSurvey = (surveyTemplate, instanceId) => {
+    setSelectedSurvey(surveyTemplate);
+    setActiveInstanceId(instanceId);
+    setCurrentScreen('counting');
   };
 
 
   const renderScreen = () => {
     switch (currentScreen) {
       case 'register':
-        // ---【変更点】編集データと戻る処理を渡す ---
         return <RegisterScreen onBack={handleBackFromForm} editingItem={editingItem} />;
       case 'preset':
-        // ---【変更点】編集データと戻る処理を渡す ---
         return <PresetScreen onBack={handleBackFromForm} editingItem={editingItem} />;
       case 'survey':
-        return <SurveySelectionScreen onBack={() => setCurrentScreen('main')} onSelectSurvey={(survey) => { setSelectedSurvey(survey); setCurrentScreen('counting'); }} />;
+        return <SurveySelectionScreen onBack={() => setCurrentScreen('main')} onSelectSurvey={handleSelectSurvey} />;
       case 'counting':
-        return <CountingScreen survey={selectedSurvey} onBack={() => setCurrentScreen('survey')} onEndSurvey={(counts) => { setSurveyResults(counts); setCurrentScreen('results'); }} />;
+        return <CountingScreen survey={selectedSurvey} instanceId={activeInstanceId} onBack={() => setCurrentScreen('survey')} onEndSurvey={(counts) => { setSurveyResults(counts); setCurrentScreen('results'); }} />;
       case 'results':
         return <ResultsScreen survey={selectedSurvey} results={surveyResults} onBack={() => setCurrentScreen('counting')} onReturnToMain={() => setCurrentScreen('main')} />;
       case 'summary':
         return <SummaryScreen onBack={() => setCurrentScreen('main')} onShowResults={handleShowResults} />;
       case 'data_management':
-        // ---【変更点】編集処理を渡す ---
         return <DataManagementScreen onBack={() => setCurrentScreen('main')} onEdit={handleEdit} />;
       default:
         return <MainMenu onNavigate={setCurrentScreen} user={user} onLogout={handleLogout} />;
