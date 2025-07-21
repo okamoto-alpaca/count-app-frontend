@@ -90,6 +90,8 @@ function App() {
         setSelectedSurvey(surveyTemplate);
         setSurveyResults(result.counts);
         setIsResultReadOnly(true);
+        // ---【追加】表示する調査結果のインスタンスIDもセット ---
+        setActiveInstanceId(result.id); 
         setCurrentScreen('results');
     } else {
         alert("元の調査テンプレートが見つかりませんでした。");
@@ -115,8 +117,10 @@ function App() {
   const handleEndSurvey = (counts) => {
     setSurveyResults(counts);
     setIsResultReadOnly(false);
+    // activeInstanceIdは既にセットされているので変更不要
     setCurrentScreen('results');
   };
+
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -134,8 +138,18 @@ function App() {
                     results={surveyResults}
                     instanceId={activeInstanceId}
                     isReadOnly={isResultReadOnly}
-                    onBack={() => isResultReadOnly ? setCurrentScreen('summary') : setCurrentScreen('counting')} 
-                    onReturnToMain={() => setCurrentScreen('main')} 
+                    onBack={() => {
+                        // ---【変更点】戻る際に不要なstateをクリア ---
+                        setIsResultReadOnly(false);
+                        setActiveInstanceId(null);
+                        const targetScreen = isResultReadOnly ? 'summary' : 'counting';
+                        setCurrentScreen(targetScreen);
+                    }} 
+                    onReturnToMain={() => {
+                        setIsResultReadOnly(false);
+                        setActiveInstanceId(null);
+                        setCurrentScreen('main');
+                    }}
                 />;
       case 'summary':
         return <SummaryScreen onBack={() => setCurrentScreen('main')} onShowResults={handleShowResults} />;
