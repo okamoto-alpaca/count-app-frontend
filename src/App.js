@@ -11,7 +11,8 @@ import ResultsScreen from './components/ResultsScreen';
 import SummaryScreen from './components/SummaryScreen';
 import DataManagementScreen from './components/DataManagementScreen';
 import PresetScreen from './components/PresetScreen';
-import UserManagementScreen from './components/UserManagementScreen'; // ---【追加】---
+// ---【変更点】CSSファイルのインポートをコンポーネント側に移動させたため、この行は削除も可能 ---
+import UserManagementScreen from './components/UserManagementScreen'; 
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -142,7 +143,7 @@ function App() {
         return <SummaryScreen onBack={() => setCurrentScreen('main')} onShowResults={handleShowResults} />;
       case 'data_management':
         return <DataManagementScreen onBack={() => setCurrentScreen('main')} onEdit={handleEdit} />;
-      case 'user_management': // ---【追加】---
+      case 'user_management':
         return <UserManagementScreen onBack={() => setCurrentScreen('main')} />;
       default:
         return <MainMenu onNavigate={setCurrentScreen} user={user} onLogout={handleLogout} />;
