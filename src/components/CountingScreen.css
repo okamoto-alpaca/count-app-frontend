@@ -1,9 +1,8 @@
 .counting-container-fixed-header {
     display: flex;
     flex-direction: column;
+    height: 100vh; /* 画面全体の高さを確保 */
     width: 100%;
-    /* ---【変更点】画面の高さいっぱいに広がるように設定 --- */
-    height: calc(100vh - 58px); /* 100vhからapp-headerの高さを引く */
 }
 
 .counting-header-sticky {
@@ -99,8 +98,8 @@
 .incidental-work-button:hover { background-color: #ffc107; color: white; }
 .wasteful-work-button:hover { background-color: #dc3545; color: white; }
 
-
-.counting-footer-fixed {
+/* ---【変更点】フッターを固定しない元のスタイルに戻す --- */
+.counting-footer {
     flex-shrink: 0;
     background-color: #f8f9fa;
     padding: 15px;
@@ -108,4 +107,14 @@
     display: flex;
     justify-content: center;
     gap: 20px;
+}
+
+/* ---【追加】ヘッダー内のカメラボタンのスタイル --- */
+.camera-button {
+    margin: 0;
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: #00aaff;
+    color: white;
+    border: none;
 }

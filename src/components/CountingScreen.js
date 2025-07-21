@@ -49,6 +49,18 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
     onEndSurvey(counts);
   };
   
+  const handleCameraClick = () => {
+    document.getElementById('camera-input-counting').click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        console.log('撮影したファイル:', file);
+        alert(`写真「${file.name}」が選択されました。（アップロード機能は未実装です）`);
+    }
+  };
+  
   const allItems = [
     ...survey.realWork.map(item => ({ category: 'real', name: item, className: 'real-work-button' })),
     ...survey.incidentalWork.map(item => ({ category: 'incidental', name: item, className: 'incidental-work-button' })),
@@ -56,7 +68,6 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
   ];
 
   return (
-    // ---【変更点】CSSクラス名を修正し、構造を変更 ---
     <div className="counting-container-fixed-header">
       <div className="counting-header-sticky">
         <div className="header-info">
@@ -64,6 +75,15 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
             <h2>カウント合計: {totalCount}</h2>
         </div>
         <div className="counting-header-actions">
+            <button className="mode-button camera-button" onClick={handleCameraClick}>カメラ</button>
+            <input 
+                type="file" 
+                id="camera-input-counting" 
+                accept="image/*" 
+                capture="environment" 
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+            />
             <button 
                 className={`minus-mode-button ${isMinusMode ? 'active' : ''}`}
                 onClick={() => setIsMinusMode(!isMinusMode)}
@@ -89,7 +109,8 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
         })}
       </main>
 
-      <footer className="counting-footer-fixed">
+      {/* ---【変更点】フッターのクラス名を元に戻す --- */}
+      <footer className="counting-footer">
         <button className="mode-button action-button" onClick={handleEndSurvey}>調査終了</button>
         <button className="mode-button back-button" onClick={onBack}>調査選択に戻る</button>
       </footer>
