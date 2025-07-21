@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 
-const PresetScreen = ({ onBack }) => {
-  const [presetName, setPresetName] = useState('');
-  const [realWorkItems, setRealWorkItems] = useState([{ id: 1, text: '' }]);
-  const [incidentalWorkItems, setIncidentalWorkItems] = useState([{ id: 1, text: '' }]);
-  const [wastefulWorkItems, setWastefulWorkItems] = useState([{ id: 1, text: '' }]);
+const PresetScreen = ({ onBack, editingItem }) => {
+  const mapToItems = (arr = []) => arr.map(text => ({ id: Date.now() + Math.random(), text }));
+  
+  const [presetName, setPresetName] = useState(editingItem ? editingItem.name : '');
+  const [realWorkItems, setRealWorkItems] = useState(editingItem ? mapToItems(editingItem.realWork) : [{ id: 1, text: '' }]);
+  const [incidentalWorkItems, setIncidentalWorkItems] = useState(editingItem ? mapToItems(editingItem.incidentalWork) : [{ id: 1, text: '' }]);
+  const [wastefulWorkItems, setWastefulWorkItems] = useState(editingItem ? mapToItems(editingItem.wastefulWork) : [{ id: 1, text: '' }]);
 
   const handleItemChange = (items, setItems, id, newText) => {
     const updatedItems = items.map(item => (item.id === id ? { ...item, text: newText } : item));
@@ -23,7 +25,7 @@ const PresetScreen = ({ onBack }) => {
     }
   };
 
-  const handlePresetRegistration = async () => {
+  const handleSave = async () => {
     const presetData = {
       name: presetName,
       realWork: realWorkItems.map(item => item.text).filter(Boolean),
@@ -42,9 +44,15 @@ const PresetScreen = ({ onBack }) => {
         return;
     }
 
+    const isEditing = !!editingItem;
+    const url = isEditing
+      ? `${process.env.REACT_APP_API_URL}/api/presets/${editingItem.id}`
+      : `${process.env.REACT_APP_API_URL}/api/presets`;
+    const method = isEditing ? 'PUT' : 'POST';
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/presets`, {
-          method: 'POST',
+      const response = await fetch(url, {
+          method: method,
           headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
@@ -55,18 +63,19 @@ const PresetScreen = ({ onBack }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || '登録中にエラーが発生しました。');
+        throw new Error(data.message || '保存中にエラーが発生しました。');
       }
 
-      alert('プリセットを登録しました。');
+      alert(isEditing ? 'プリセットを更新しました。' : 'プリセットを登録しました。');
       onBack();
 
     } catch (e) {
-      console.error("Error adding preset: ", e);
+      console.error("Error saving preset: ", e);
       alert(e.message);
     }
   };
 
+  // PresetScreenでは並び替えは不要なため、元のシンプルなrenderWorkCategoryを使用
   const renderWorkCategory = (title, items, setItems, placeholder, className) => (
     <div className={`work-category-box ${className}`}>
       <h2>{title}</h2>
@@ -88,7 +97,7 @@ const PresetScreen = ({ onBack }) => {
 
   return (
     <div className="form-container">
-      <h1 className="form-title">プリセット登録</h1>
+      <h1 className="form-title">{editingItem ? 'プリセット編集' : 'プリセット登録'}</h1>
       <div className="input-group">
         <input type="text" placeholder="プリセット名" className="form-input" value={presetName} onChange={(e) => setPresetName(e.target.value)} />
       </div>
@@ -96,7 +105,7 @@ const PresetScreen = ({ onBack }) => {
       {renderWorkCategory('付随作業', incidentalWorkItems, setIncidentalWorkItems, '付随作業 項目', 'incidental-work')}
       {renderWorkCategory('ムダ作業', wastefulWorkItems, setWastefulWorkItems, 'ムダ作業 項目', 'wasteful-work')}
       <div className="form-actions">
-        <button className="mode-button action-button" onClick={handlePresetRegistration}>プリセット登録</button>
+        <button className="mode-button action-button" onClick={handleSave}>{editingItem ? '更新完了' : 'プリセット登録'}</button>
         <button className="mode-button back-button" onClick={onBack}>戻る</button>
       </div>
     </div>

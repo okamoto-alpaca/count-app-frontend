@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import './RegisterScreen.css';
 
-// ---【追加】ドラッグハンドル用のアイコン ---
 const DragHandle = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="drag-handle-icon">
         <path d="M7 10H5C4.44772 10 4 9.55228 4 9V7C4 6.44772 4.44772 6 5 6H7C7.55228 6 8 6.44772 8 7V9C8 9.55228 7.55228 10 7 10Z" fill="currentColor"/>
@@ -31,12 +30,15 @@ const PresetModal = ({ presets, onSelect, onClose }) => (
     </div>
 );
 
-const RegisterScreen = ({ onBack }) => {
-  const [surveyNo, setSurveyNo] = useState('');
-  const [surveyName, setSurveyName] = useState('');
-  const [realWorkItems, setRealWorkItems] = useState([{ id: 1, text: '' }]);
-  const [incidentalWorkItems, setIncidentalWorkItems] = useState([{ id: 1, text: '' }]);
-  const [wastefulWorkItems, setWastefulWorkItems] = useState([{ id: 1, text: '' }]);
+const RegisterScreen = ({ onBack, editingItem }) => { // ---【変更点】editingItemを受け取る
+  // ---【変更点】editingItemがあればその値で、なければ空で初期化 ---
+  const mapToItems = (arr = []) => arr.map(text => ({ id: Date.now() + Math.random(), text }));
+  
+  const [surveyNo, setSurveyNo] = useState(editingItem ? editingItem.no : '');
+  const [surveyName, setSurveyName] = useState(editingItem ? editingItem.name : '');
+  const [realWorkItems, setRealWorkItems] = useState(editingItem ? mapToItems(editingItem.realWork) : [{ id: 1, text: '' }]);
+  const [incidentalWorkItems, setIncidentalWorkItems] = useState(editingItem ? mapToItems(editingItem.incidentalWork) : [{ id: 1, text: '' }]);
+  const [wastefulWorkItems, setWastefulWorkItems] = useState(editingItem ? mapToItems(editingItem.wastefulWork) : [{ id: 1, text: '' }]);
 
   const [presets, setPresets] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,12 +63,9 @@ const RegisterScreen = ({ onBack }) => {
   }, []);
 
   const handleSelectPreset = (preset) => {
-    const mapToItems = (arr) => arr.map(text => ({ id: Date.now() + Math.random(), text }));
-    
     setRealWorkItems(preset.realWork.length > 0 ? mapToItems(preset.realWork) : [{ id: 1, text: '' }]);
     setIncidentalWorkItems(preset.incidentalWork.length > 0 ? mapToItems(preset.incidentalWork) : [{ id: 1, text: '' }]);
     setWastefulWorkItems(preset.wastefulWork.length > 0 ? mapToItems(preset.wastefulWork) : [{ id: 1, text: '' }]);
-    
     setIsModalOpen(false);
   };
 
@@ -86,8 +85,9 @@ const RegisterScreen = ({ onBack }) => {
       setItems(updatedItems);
     }
   };
-
-  const handleRegistrationComplete = async () => {
+  
+  // ---【変更点】保存処理を新規・更新で分岐 ---
+  const handleSave = async () => {
     const surveyData = {
       no: surveyNo,
       name: surveyName,
@@ -107,9 +107,16 @@ const RegisterScreen = ({ onBack }) => {
         return;
     }
 
+    // 編集モードか新規作成モードかを判断
+    const isEditing = !!editingItem;
+    const url = isEditing
+      ? `${process.env.REACT_APP_API_URL}/api/surveys/${editingItem.id}`
+      : `${process.env.REACT_APP_API_URL}/api/surveys`;
+    const method = isEditing ? 'PUT' : 'POST';
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/surveys`, {
-          method: 'POST',
+      const response = await fetch(url, {
+          method: method,
           headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
@@ -120,14 +127,14 @@ const RegisterScreen = ({ onBack }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || '登録中にエラーが発生しました。');
+        throw new Error(data.message || '保存中にエラーが発生しました。');
       }
 
-      alert('登録が完了しました。');
+      alert(isEditing ? '更新が完了しました。' : '登録が完了しました。');
       onBack();
 
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("Error saving survey: ", e);
       alert(e.message);
     }
   };
@@ -155,7 +162,6 @@ const RegisterScreen = ({ onBack }) => {
                       {...provided.draggableProps}
                       className={`list-item ${snapshot.isDragging ? 'dragging' : ''}`}
                     >
-                      {/* ---【変更点】ドラッグハンドルをここに配置し、ドラッグ用のpropsを渡す --- */}
                       <div {...provided.dragHandleProps} className="drag-handle">
                         <DragHandle />
                       </div>
@@ -186,8 +192,8 @@ const RegisterScreen = ({ onBack }) => {
       
       <div className="form-container">
         <div className="form-header">
-            <h1 className="form-title">調査名・項目登録</h1>
-            <button className="mode-button preset-call-button" onClick={() => setIsModalOpen(true)}>プリセットから呼び出す</button>
+            <h1 className="form-title">{editingItem ? '調査名・項目編集' : '調査名・項目登録'}</h1>
+            {!editingItem && <button className="mode-button preset-call-button" onClick={() => setIsModalOpen(true)}>プリセットから呼び出す</button>}
         </div>
 
         <div className="input-group">
@@ -198,7 +204,7 @@ const RegisterScreen = ({ onBack }) => {
         {renderWorkCategory('付随作業', incidentalWorkItems, setIncidentalWorkItems, '付随作業 項目', 'incidental-work', 'incidentalWork')}
         {renderWorkCategory('ムダ作業', wastefulWorkItems, setWastefulWorkItems, 'ムダ作業 項目', 'wasteful-work', 'wastefulWork')}
         <div className="form-actions">
-          <button className="mode-button action-button" onClick={handleRegistrationComplete}>登録完了</button>
+          <button className="mode-button action-button" onClick={handleSave}>{editingItem ? '更新完了' : '登録完了'}</button>
           <button className="mode-button back-button" onClick={onBack}>戻る</button>
         </div>
       </div>
