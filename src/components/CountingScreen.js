@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 
-const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => { // ---【変更点】instanceIdを受け取る
+const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
   const [counts, setCounts] = useState({});
   const [totalCount, setTotalCount] = useState(0);
 
-  // ---【変更点】localStorageのキーをインスタンスごとに一意にする ---
   const storageKey = `survey-progress-${instanceId}`;
 
+  // ---【変更点】useEffectの依存配列からsurveyを削除 ---
+  // これにより、surveyオブジェクトが再生成されても、instanceIdが変わらない限り再実行されなくなり、
+  // 意図せずカウントがリセットされるのを防ぎます。
+  // localStorageからの読み込みは、コンポーネントがマウントされた時（instanceIdがセットされた時）の一度きりで十分です。
   useEffect(() => {
-    // ---【変更点】localStorageから途中経過を読み込む ---
     const savedProgress = localStorage.getItem(storageKey);
     if (savedProgress) {
         const parsedProgress = JSON.parse(savedProgress);
         setCounts(parsedProgress);
-        // 合計カウントも復元
         const total = Object.values(parsedProgress).reduce((sum, count) => sum + count, 0);
         setTotalCount(total);
     } else {
-        // 保存されたデータがない場合、カウントを初期化
         const initialCounts = {};
         survey.realWork.forEach(item => { initialCounts[`real-${item}`] = 0; });
         survey.incidentalWork.forEach(item => { initialCounts[`incidental-${item}`] = 0; });
@@ -25,19 +25,19 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => { // ---
         setCounts(initialCounts);
         setTotalCount(0);
     }
-  }, [survey, instanceId, storageKey]); // 依存配列にinstanceIdとstorageKeyを追加
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instanceId, storageKey]); // 依存配列からsurveyを削除
+
 
   const handleCount = (category, item) => {
     const key = `${category}-${item}`;
     const newCounts = { ...counts, [key]: (counts[key] || 0) + 1 };
     setCounts(newCounts);
     setTotalCount(prevTotal => prevTotal + 1);
-    // ---【変更点】カウントのたびにlocalStorageに保存 ---
     localStorage.setItem(storageKey, JSON.stringify(newCounts));
   };
 
   const handleEndSurvey = () => {
-    // ---【変更点】調査終了時にlocalStorageのデータを削除 ---
     localStorage.removeItem(storageKey);
     onEndSurvey(counts);
   };
