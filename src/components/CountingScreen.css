@@ -13,6 +13,7 @@
     background-color: #f8f9fa;
     padding: 15px;
     border-bottom: 1px solid #dee2e6;
+    z-index: 10;
 }
 
 .header-info {
@@ -59,9 +60,13 @@
     border-color: #dc3545;
 }
 
-.counting-grid-scrollable {
-    flex-grow: 1; /* ---【変更点】高さを可変にする --- */
+/* ---【追加】スクロール用のラッパー --- */
+.counting-scroll-wrapper {
+    flex-grow: 1;
     overflow-y: auto;
+}
+
+.counting-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;

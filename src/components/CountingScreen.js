@@ -93,27 +93,27 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
         </div>
       </div>
 
-      <div className="counting-grid-scrollable">
-        {allItems.map((item, index) => {
-            const key = `${item.category}-${item.name}`;
-            return (
-                <button 
-                    key={index} 
-                    className={`grid-item-button ${item.className}`} 
-                    onClick={() => handleCount(item.category, item.name)}
-                >
-                    {item.name}
-                    <span className="count-number">{counts[key] || 0}</span>
-                </button>
-            );
-        })}
+      <div className="counting-scroll-wrapper">
+        <main className="counting-grid">
+            {allItems.map((item, index) => {
+                const key = `${item.category}-${item.name}`;
+                return (
+                    <button 
+                        key={index} 
+                        className={`grid-item-button ${item.className}`} 
+                        onClick={() => handleCount(item.category, item.name)}
+                    >
+                        {item.name}
+                        <span className="count-number">{counts[key] || 0}</span>
+                    </button>
+                );
+            })}
+        </main>
+        <footer className="counting-footer">
+            <button className="mode-button action-button" onClick={handleEndSurvey}>調査終了</button>
+            <button className="mode-button back-button" onClick={onBack}>調査選択に戻る</button>
+        </footer>
       </div>
-      
-      {/* ---【変更点】フッターをスクロール部分の外に移動 --- */}
-      <footer className="counting-footer">
-        <button className="mode-button action-button" onClick={handleEndSurvey}>調査終了</button>
-        <button className="mode-button back-button" onClick={onBack}>調査選択に戻る</button>
-      </footer>
     </div>
   );
 };
