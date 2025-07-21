@@ -1,4 +1,4 @@
-import React, 'useState', useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const DataManagementScreen = ({ onBack }) => {
   const [mode, setMode] = useState('surveys'); // 'surveys' or 'presets'
@@ -31,7 +31,10 @@ const DataManagementScreen = ({ onBack }) => {
       }
     };
 
-    fetchItems();
+    // modeが空の場合は何もしない（リスト再読み込みのトリック用）
+    if (mode) {
+        fetchItems();
+    }
     setSelectedIds([]); // モードが切り替わったら選択をリセット
   }, [mode]); // modeが変更されたら再実行
 
