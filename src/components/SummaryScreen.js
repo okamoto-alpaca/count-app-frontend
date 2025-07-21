@@ -1,7 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 
+// ---【追加】再計算のためのヘルパー関数 ---
+const calculateMetrics = (surveyTemplate, counts) => {
+    if (!surveyTemplate) return { total: 0, discoveryRate: 0, rank: 'N/A' };
+
+    const getSubtotal = (category, items) => {
+        return items.reduce((sum, item) => {
+            const key = `${category}-${item}`;
+            return sum + (counts[key] || 0);
+        }, 0);
+    };
+
+    const realWorkSubtotal = getSubtotal('real', surveyTemplate.realWork);
+    const incidentalWorkSubtotal = getSubtotal('incidental', surveyTemplate.incidentalWork);
+    const wastefulWorkSubtotal = getSubtotal('wasteful', surveyTemplate.wastefulWork);
+    
+    const total = realWorkSubtotal + incidentalWorkSubtotal + wastefulWorkSubtotal;
+    const discoveryRate = total > 0 ? (((realWorkSubtotal * 0) + (incidentalWorkSubtotal * 0.2) + (wastefulWorkSubtotal * 0.5)) / total) * 100 : 0;
+
+    const getEvaluationRank = (rate) => {
+        if (rate < 3) return 'S';
+        if (rate < 8) return 'A';
+        if (rate < 13) return 'B';
+        if (rate < 18) return 'C';
+        return 'D';
+    };
+    const rank = getEvaluationRank(discoveryRate);
+
+    return { total, discoveryRate, rank };
+};
+
+
 const PeriodResultsTable = ({ results }) => {
+    // ---【変更点】countsだけでなく全てのキーを対象にする ---
     const allItems = [...new Set(results.flatMap(result => Object.keys(result.counts)))].sort();
     const sortedResults = [...results].sort((a, b) => new Date(a.surveyedAt) - new Date(b.surveyedAt));
 
@@ -12,7 +44,7 @@ const PeriodResultsTable = ({ results }) => {
                     <tr>
                         <th>調査日</th>
                         <th>調査名</th>
-                        {allItems.map(item => <th key={item}>{item}</th>)}
+                        {allItems.map(item => <th key={item}>{item.split('-').slice(1).join('-')}</th>)}
                         <th>合計</th>
                         <th>ムダ発見率</th>
                         <th>評価</th>
@@ -120,9 +152,21 @@ const SummaryScreen = ({ onBack, onShowResults }) => {
           if (!response.ok) {
               throw new Error(data.message || '検索に失敗しました。');
           }
+
+          // ---【変更点】APIからのデータに不足情報を追加する ---
+          const processedResults = data.map(result => {
+            const surveyTemplate = surveys.find(s => s.id === result.surveyId);
+            const metrics = calculateMetrics(surveyTemplate, result.counts);
+            return {
+                ...result,
+                totalCount: metrics.total,
+                discoveryRate: metrics.discoveryRate,
+                rank: metrics.rank
+            };
+          });
           
-          setFoundResults(data);
-          if (data.length === 0) {
+          setFoundResults(processedResults);
+          if (processedResults.length === 0) {
               alert('その期間の調査結果は見つかりませんでした。');
           }
       } catch (error) {
