@@ -1,7 +1,6 @@
 import React from 'react';
 
-const ResultsScreen = ({ survey, results, onBack, onReturnToMain }) => {
-  // ---【変更点】カテゴリプレフィックスを考慮した集計関数 ---
+const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onReturnToMain }) => {
   const getSubtotal = (category, items) => {
     return items.reduce((sum, item) => {
         const key = `${category}-${item}`;
@@ -27,6 +26,7 @@ const ResultsScreen = ({ survey, results, onBack, onReturnToMain }) => {
 
   const handleSaveResults = async () => {
     const resultData = {
+      instanceId, // どの調査インスタンスを完了させるか
       surveyId: survey.id,
       surveyName: survey.name,
       counts: results,
@@ -66,7 +66,6 @@ const ResultsScreen = ({ survey, results, onBack, onReturnToMain }) => {
     }
   };
 
-  // ---【変更点】カテゴリプレフィックスを考慮した行レンダリング関数 ---
   const renderTableRows = (title, category, items) => (
     items.length > 0 && items.map((item, index) => {
       const key = `${category}-${item}`;
@@ -108,11 +107,21 @@ const ResultsScreen = ({ survey, results, onBack, onReturnToMain }) => {
           <tr><th colSpan="2">合計</th><th>{total}</th><th>100.0%</th></tr>
         </tfoot>
       </table>
-      <div className="form-actions">
-        <button className="mode-button action-button" onClick={handleSaveResults}>今回の結果を保存</button>
-        <button className="mode-button back-button" onClick={onReturnToMain}>調査を破棄</button>
-      </div>
-      <button className="mode-button" onClick={onBack}>カウント画面に戻る</button>
+
+      {/* ---【変更点】isReadOnlyフラグでボタンを切り替え --- */}
+      {isReadOnly ? (
+        <div className="form-actions">
+            <button className="mode-button back-button" onClick={onBack}>集計画面に戻る</button>
+        </div>
+      ) : (
+        <>
+            <div className="form-actions">
+                <button className="mode-button action-button" onClick={handleSaveResults}>今回の結果を保存</button>
+                <button className="mode-button back-button" onClick={onReturnToMain}>調査を破棄</button>
+            </div>
+            <button className="mode-button" onClick={onBack}>カウント画面に戻る</button>
+        </>
+      )}
     </div>
   );
 };

@@ -22,7 +22,9 @@ function App() {
   const [surveyResults, setSurveyResults] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
-  const [activeInstanceId, setActiveInstanceId] = useState(null); // ---【追加】---
+  const [activeInstanceId, setActiveInstanceId] = useState(null);
+  const [isResultReadOnly, setIsResultReadOnly] = useState(false); // ---【追加】---
+
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -81,11 +83,13 @@ function App() {
     setCurrentScreen('main');
   };
   
+  // ---【変更点】集計画面からの遷移時にフラグを立てる ---
   const handleShowResults = (result, surveys) => {
     const surveyTemplate = surveys.find(s => s.id === result.surveyId);
     if (surveyTemplate) {
         setSelectedSurvey(surveyTemplate);
         setSurveyResults(result.counts);
+        setIsResultReadOnly(true); // 読み取り専用フラグを立てる
         setCurrentScreen('results');
     } else {
         alert("元の調査テンプレートが見つかりませんでした。");
@@ -102,11 +106,17 @@ function App() {
     setCurrentScreen('main');
   };
 
-  // ---【追加】調査選択時の処理を更新 ---
   const handleSelectSurvey = (surveyTemplate, instanceId) => {
     setSelectedSurvey(surveyTemplate);
     setActiveInstanceId(instanceId);
     setCurrentScreen('counting');
+  };
+  
+  // ---【追加】カウント画面から結果画面への遷移処理 ---
+  const handleEndSurvey = (counts) => {
+    setSurveyResults(counts);
+    setIsResultReadOnly(false); // 読み取り専用ではない
+    setCurrentScreen('results');
   };
 
 
@@ -119,9 +129,16 @@ function App() {
       case 'survey':
         return <SurveySelectionScreen onBack={() => setCurrentScreen('main')} onSelectSurvey={handleSelectSurvey} />;
       case 'counting':
-        return <CountingScreen survey={selectedSurvey} instanceId={activeInstanceId} onBack={() => setCurrentScreen('survey')} onEndSurvey={(counts) => { setSurveyResults(counts); setCurrentScreen('results'); }} />;
+        return <CountingScreen survey={selectedSurvey} instanceId={activeInstanceId} onBack={() => setCurrentScreen('survey')} onEndSurvey={handleEndSurvey} />;
       case 'results':
-        return <ResultsScreen survey={selectedSurvey} results={surveyResults} onBack={() => setCurrentScreen('counting')} onReturnToMain={() => setCurrentScreen('main')} />;
+        return <ResultsScreen 
+                    survey={selectedSurvey} 
+                    results={surveyResults}
+                    instanceId={activeInstanceId} // 保存時に必要
+                    isReadOnly={isResultReadOnly} // 読み取り専用かどうかのフラグ
+                    onBack={() => isResultReadOnly ? setCurrentScreen('summary') : setCurrentScreen('counting')} 
+                    onReturnToMain={() => setCurrentScreen('main')} 
+                />;
       case 'summary':
         return <SummaryScreen onBack={() => setCurrentScreen('main')} onShowResults={handleShowResults} />;
       case 'data_management':

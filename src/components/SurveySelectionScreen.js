@@ -4,48 +4,40 @@ const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
   const [surveyTemplates, setSurveyTemplates] = useState([]);
   const [inProgressSurveys, setInProgressSurveys] = useState([]);
   
-  // 調査テンプレートと進行中の調査の両方を取得する
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    // テンプレート一覧を取得
-    const fetchTemplates = async () => {
+    const fetchTemplatesAndInProgress = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/surveys`, {
+        // テンプレート一覧を取得
+        const templatesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/surveys`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        const data = await response.json();
-        if (response.ok) setSurveyTemplates(data);
-      } catch (error) {
-        console.error("Error fetching survey templates: ", error);
-      }
-    };
+        const templatesData = await templatesResponse.json();
+        if (templatesResponse.ok) {
+            setSurveyTemplates(templatesData);
 
-    // 進行中の調査を取得
-    const fetchInProgress = async () => {
-        try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/survey-instances/in-progress`, {
+            // 進行中の調査を取得
+            const inProgressResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/survey-instances/in-progress`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            const data = await response.json();
-            if (response.ok) {
-                // テンプレート名を追加情報として結合しておく
-                const populatedInstances = data.map(instance => {
-                    const template = surveyTemplates.find(t => t.id === instance.surveyTemplateId);
+            const inProgressData = await inProgressResponse.json();
+            if (inProgressResponse.ok) {
+                const populatedInstances = inProgressData.map(instance => {
+                    const template = templatesData.find(t => t.id === instance.surveyTemplateId);
                     return { ...instance, name: template ? template.name : '不明な調査' };
                 });
                 setInProgressSurveys(populatedInstances);
             }
-        } catch (error) {
-            console.error("Error fetching in-progress surveys: ", error);
         }
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
     };
-
-    // テンプレートを先に取得し、その後で進行中の調査を取得
-    fetchTemplates().then(fetchInProgress);
-
-  }, [surveyTemplates]); // surveyTemplatesが更新された後、再実行
+    
+    fetchTemplatesAndInProgress();
+  }, []);
 
 
   const handleStartNew = async (surveyTemplate) => {
@@ -63,7 +55,11 @@ const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ surveyTemplateId: surveyTemplate.id })
+                // ---【変更点】テンプレートの名前も渡す ---
+                body: JSON.stringify({ 
+                    surveyTemplateId: surveyTemplate.id,
+                    surveyTemplateName: surveyTemplate.name 
+                })
             });
 
             const data = await response.json();
@@ -90,7 +86,6 @@ const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
 
   return (
     <div className="screen-container">
-      {/* ---【追加】進行中の調査があれば表示 --- */}
       {inProgressSurveys.length > 0 && (
         <div className="in-progress-section">
             <h2>進行中の調査</h2>
