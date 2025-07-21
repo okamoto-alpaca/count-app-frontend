@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MainMenu = ({ onNavigate, user }) => {
+const MainMenu = ({ onNavigate, user, onLogout }) => {
     // master または super 権限があるかどうかを判定
     const hasAdminRights = user.role === 'master' || user.role === 'super';
 
@@ -24,7 +24,8 @@ const MainMenu = ({ onNavigate, user }) => {
                 </>
             )}
 
-            <button className="mode-button" onClick={() => alert('終了します')}>終了</button>
+            {/* ---【変更点】onClickイベントをonLogoutに変更 --- */}
+            <button className="mode-button" onClick={onLogout}>終了</button>
         </div>
     );
 };

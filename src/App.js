@@ -104,7 +104,8 @@ function App() {
       case 'data_management':
         return <DataManagementScreen onBack={() => setCurrentScreen('main')} />;
       default:
-        return <MainMenu onNavigate={setCurrentScreen} user={user} />;
+        // ---【変更点】MainMenuにonLogoutを渡す ---
+        return <MainMenu onNavigate={setCurrentScreen} user={user} onLogout={handleLogout} />;
     }
   };
 
@@ -119,8 +120,8 @@ function App() {
   return (
     <div className="App">
        <header className="app-header">
+         {/* ---【変更点】ログアウトボタンを削除 --- */}
          <span>ようこそ {user.name}さん ({user.role})</span>
-         <button onClick={handleLogout} className="mode-button back-button">ログアウト</button>
        </header>
       {renderScreen()}
     </div>
