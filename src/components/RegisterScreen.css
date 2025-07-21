@@ -61,3 +61,8 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-color: #00aaff;
 }
+
+/* ---【追加】ドラッグ中のアイテムのスタイル --- */
+.list-item.dragging {
+    background-color: #e6f7ff; /* 明るい青色 */
+}

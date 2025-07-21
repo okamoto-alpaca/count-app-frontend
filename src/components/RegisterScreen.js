@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import './RegisterScreen.css'; // ---【追加】モーダル用のCSSをインポート
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'; // ---【追加】---
+import './RegisterScreen.css';
 
-// ---【追加】プリセット選択モーダルのコンポーネント ---
 const PresetModal = ({ presets, onSelect, onClose }) => (
     <div className="modal-backdrop">
         <div className="modal-content">
@@ -25,12 +25,9 @@ const RegisterScreen = ({ onBack }) => {
   const [incidentalWorkItems, setIncidentalWorkItems] = useState([{ id: 1, text: '' }]);
   const [wastefulWorkItems, setWastefulWorkItems] = useState([{ id: 1, text: '' }]);
 
-  // ---【追加】プリセット関連のstate ---
   const [presets, setPresets] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
-  // ---【追加】プリセット一覧を取得する処理 ---
   useEffect(() => {
     const fetchPresets = async () => {
         const token = localStorage.getItem('token');
@@ -50,7 +47,6 @@ const RegisterScreen = ({ onBack }) => {
     fetchPresets();
   }, []);
 
-  // ---【追加】プリセットを選択したときの処理 ---
   const handleSelectPreset = (preset) => {
     const mapToItems = (arr) => arr.map(text => ({ id: Date.now() + Math.random(), text }));
     
@@ -60,7 +56,6 @@ const RegisterScreen = ({ onBack }) => {
     
     setIsModalOpen(false);
   };
-
 
   const handleItemChange = (items, setItems, id, newText) => {
     const updatedItems = items.map(item => (item.id === id ? { ...item, text: newText } : item));
@@ -123,35 +118,61 @@ const RegisterScreen = ({ onBack }) => {
       alert(e.message);
     }
   };
+  
+  // ---【追加】ドラッグ終了時の処理 ---
+  const onDragEnd = (result, items, setItems) => {
+    if (!result.destination) return;
+    const newItems = Array.from(items);
+    const [reorderedItem] = newItems.splice(result.source.index, 1);
+    newItems.splice(result.destination.index, 0, reorderedItem);
+    setItems(newItems);
+  };
 
-  const renderWorkCategory = (title, items, setItems, placeholder, className) => (
+  const renderWorkCategory = (title, items, setItems, placeholder, className, droppableId) => (
     <div className={`work-category-box ${className}`}>
       <h2>{title}</h2>
-      {items.map(item => (
-        <div key={item.id} className="list-item">
-          <input
-            type="text"
-            placeholder={placeholder}
-            className="form-input"
-            value={item.text}
-            onChange={(e) => handleItemChange(items, setItems, item.id, e.target.value)}
-          />
-          <button onClick={() => deleteItem(items, setItems, item.id)} className="delete-button">削除</button>
-        </div>
-      ))}
+      {/* ---【変更点】ドラッグ＆ドロップのコンテキストでリストを囲む --- */}
+      <DragDropContext onDragEnd={(result) => onDragEnd(result, items, setItems)}>
+        <Droppable droppableId={droppableId}>
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {items.map((item, index) => (
+                <Draggable key={item.id} draggableId={String(item.id)} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className={`list-item ${snapshot.isDragging ? 'dragging' : ''}`}
+                    >
+                      <input
+                        type="text"
+                        placeholder={placeholder}
+                        className="form-input"
+                        value={item.text}
+                        onChange={(e) => handleItemChange(items, setItems, item.id, e.target.value)}
+                      />
+                      <button onClick={() => deleteItem(items, setItems, item.id)} className="delete-button">削除</button>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       <button onClick={() => addItem(items, setItems)} className="add-button">＋ 項目を追加</button>
     </div>
   );
 
   return (
     <>
-      {/* ---【追加】モーダル表示の制御 --- */}
       {isModalOpen && <PresetModal presets={presets} onSelect={handleSelectPreset} onClose={() => setIsModalOpen(false)} />}
       
       <div className="form-container">
         <div className="form-header">
             <h1 className="form-title">調査名・項目登録</h1>
-            {/* ---【追加】プリセット呼び出しボタン --- */}
             <button className="mode-button preset-call-button" onClick={() => setIsModalOpen(true)}>プリセットから呼び出す</button>
         </div>
 
@@ -159,9 +180,10 @@ const RegisterScreen = ({ onBack }) => {
           <input type="text" placeholder="調査名 No" className="form-input" value={surveyNo} onChange={(e) => setSurveyNo(e.target.value)} />
           <input type="text" placeholder="調査名" className="form-input" value={surveyName} onChange={(e) => setSurveyName(e.target.value)} />
         </div>
-        {renderWorkCategory('実作業', realWorkItems, setRealWorkItems, '実作業 項目', 'real-work')}
-        {renderWorkCategory('付随作業', incidentalWorkItems, setIncidentalWorkItems, '付随作業 項目', 'incidental-work')}
-        {renderWorkCategory('ムダ作業', wastefulWorkItems, setWastefulWorkItems, 'ムダ作業 項目', 'wasteful-work')}
+        {/* ---【変更点】Droppable IDを渡す --- */}
+        {renderWorkCategory('実作業', realWorkItems, setRealWorkItems, '実作業 項目', 'real-work', 'realWork')}
+        {renderWorkCategory('付随作業', incidentalWorkItems, setIncidentalWorkItems, '付随作業 項目', 'incidental-work', 'incidentalWork')}
+        {renderWorkCategory('ムダ作業', wastefulWorkItems, setWastefulWorkItems, 'ムダ作業 項目', 'wasteful-work', 'wastefulWork')}
         <div className="form-actions">
           <button className="mode-button action-button" onClick={handleRegistrationComplete}>登録完了</button>
           <button className="mode-button back-button" onClick={onBack}>戻る</button>
