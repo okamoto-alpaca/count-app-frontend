@@ -1,4 +1,53 @@
-.counting-header-single-line {
+.counting-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.counting-header {
+  background-color: #f8f9fa;
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.counting-header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+.counting-header h2 {
+  margin: 5px 0 0;
+  font-size: 18px;
+  color: #6c757d;
+}
+
+.counting-main {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.counting-footer {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* ---【ここから下が新しいスタイル】--- */
+
+.counting-container-fixed-header {
+    display: flex;
+    flex-direction: column;
+    /* 親コンテナ(app-main)の高さを100%使うように設定 */
+    height: 100%; 
+    width: 100%;
+}
+
+.counting-header-sticky {
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -7,10 +56,17 @@
     border-bottom: 1px solid #dee2e6;
 }
 
-.counting-header-single-line h1,
-.counting-header-single-line h2 {
+.counting-header-sticky h1,
+.counting-header-sticky h2 {
     margin: 0;
     font-size: 18px;
+    white-space: nowrap;
+}
+
+.counting-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .minus-mode-button {
@@ -31,9 +87,10 @@
     border-color: #dc3545;
 }
 
-.counting-grid {
+.counting-grid-scrollable {
+    flex-grow: 1;
+    overflow-y: auto;
     display: grid;
-    /* 5列のグリッドを作成 */
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     padding: 20px;
@@ -52,7 +109,7 @@
     justify-content: center;
     gap: 5px;
     transition: all 0.2s;
-    word-break: break-all; /* 長い単語を折り返す */
+    word-break: break-all;
     min-height: 80px;
 }
 
@@ -60,12 +117,12 @@
     font-size: 20px;
 }
 
-/* ---【ここから変更】--- */
-
-.real-work-button { border-color: #007bff; color: #007bff; background-color: #e7f3ff; }
-.incidental-work-button { border-color: #ffc107; color: #b88a00; background-color: #fff8e1; }
-.wasteful-work-button { border-color: #dc3545; color: #dc3545; background-color: #fdecea; }
-
-.real-work-button:hover { background-color: #007bff; color: white; }
-.incidental-work-button:hover { background-color: #ffc107; color: white; }
-.wasteful-work-button:hover { background-color: #dc3545; color: white; }
+.counting-footer-fixed {
+    flex-shrink: 0;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
