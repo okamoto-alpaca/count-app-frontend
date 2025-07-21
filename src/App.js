@@ -10,7 +10,7 @@ import CountingScreen from './components/CountingScreen';
 import ResultsScreen from './components/ResultsScreen';
 import SummaryScreen from './components/SummaryScreen';
 import DataManagementScreen from './components/DataManagementScreen';
-import PresetScreen from './components/PresetScreen'; // ---【追加】---
+import PresetScreen from './components/PresetScreen';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -21,6 +21,10 @@ function App() {
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [surveyResults, setSurveyResults] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // ---【追加】編集対象のデータを保持するstate ---
+  const [editingItem, setEditingItem] = useState(null);
+
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -90,12 +94,28 @@ function App() {
     }
   };
 
+  // ---【追加】編集ボタンが押されたときの処理 ---
+  const handleEdit = (mode, item) => {
+    setEditingItem(item);
+    // modeが 'surveys' なら 'register'画面へ、'presets' なら 'preset'画面へ遷移
+    setCurrentScreen(mode === 'surveys' ? 'register' : 'preset');
+  };
+
+  // ---【追加】登録・編集画面から戻るときの処理 ---
+  const handleBackFromForm = () => {
+    setEditingItem(null); // 編集データをクリア
+    setCurrentScreen('main');
+  };
+
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'register':
-        return <RegisterScreen onBack={() => setCurrentScreen('main')} />;
-      case 'preset': // ---【追加】---
-        return <PresetScreen onBack={() => setCurrentScreen('main')} />;
+        // ---【変更点】編集データと戻る処理を渡す ---
+        return <RegisterScreen onBack={handleBackFromForm} editingItem={editingItem} />;
+      case 'preset':
+        // ---【変更点】編集データと戻る処理を渡す ---
+        return <PresetScreen onBack={handleBackFromForm} editingItem={editingItem} />;
       case 'survey':
         return <SurveySelectionScreen onBack={() => setCurrentScreen('main')} onSelectSurvey={(survey) => { setSelectedSurvey(survey); setCurrentScreen('counting'); }} />;
       case 'counting':
@@ -105,7 +125,8 @@ function App() {
       case 'summary':
         return <SummaryScreen onBack={() => setCurrentScreen('main')} onShowResults={handleShowResults} />;
       case 'data_management':
-        return <DataManagementScreen onBack={() => setCurrentScreen('main')} />;
+        // ---【変更点】編集処理を渡す ---
+        return <DataManagementScreen onBack={() => setCurrentScreen('main')} onEdit={handleEdit} />;
       default:
         return <MainMenu onNavigate={setCurrentScreen} user={user} onLogout={handleLogout} />;
     }

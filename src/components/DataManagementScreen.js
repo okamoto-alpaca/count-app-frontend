@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const DataManagementScreen = ({ onBack }) => {
-  const [mode, setMode] = useState('surveys'); // 'surveys' or 'presets'
+const DataManagementScreen = ({ onBack, onEdit }) => { // ---【追加】onEditを受け取る
+  const [mode, setMode] = useState('surveys'); 
   const [items, setItems] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -12,8 +12,7 @@ const DataManagementScreen = ({ onBack }) => {
         alert('認証エラー。再ログインしてください。');
         return;
       }
-
-      // modeに応じてAPIのエンドポイントを切り替える
+      
       const endpoint = mode === 'surveys' ? '/api/surveys' : '/api/presets';
 
       try {
@@ -31,12 +30,11 @@ const DataManagementScreen = ({ onBack }) => {
       }
     };
 
-    // modeが空の場合は何もしない（リスト再読み込みのトリック用）
     if (mode) {
         fetchItems();
     }
-    setSelectedIds([]); // モードが切り替わったら選択をリセット
-  }, [mode]); // modeが変更されたら再実行
+    setSelectedIds([]);
+  }, [mode]);
 
   const handleCheckboxChange = (id) => {
     setSelectedIds(prevSelected =>
@@ -78,7 +76,6 @@ const DataManagementScreen = ({ onBack }) => {
 
         alert('削除が完了しました。');
         setSelectedIds([]);
-        // リストを再読み込みするためにmodeを一度空にしてから戻すトリック
         const currentMode = mode;
         setMode('');
         setTimeout(() => setMode(currentMode), 0);
@@ -92,7 +89,6 @@ const DataManagementScreen = ({ onBack }) => {
 
   return (
     <div className="data-management-container">
-      {/* ---【追加】タブ切り替えUI --- */}
       <div className="mode-toggle">
         <button
           className={`toggle-button ${mode === 'surveys' ? 'active' : ''}`}
@@ -118,6 +114,8 @@ const DataManagementScreen = ({ onBack }) => {
             />
             <span className="data-name">{item.name}</span>
             <span className="data-date">作成日: {new Date(item.createdAt).toLocaleDateString()}</span>
+            {/* ---【追加】編集ボタン --- */}
+            <button className="mode-button edit-button" onClick={() => onEdit(mode, item)}>編集</button>
           </div>
         ))}
       </div>

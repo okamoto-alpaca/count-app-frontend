@@ -651,3 +651,14 @@
 .login-form .action-button {
   margin-top: 10px;
 }
+
+/* この部分をApp.cssの一番下に追加 */
+.data-item .edit-button {
+    margin-left: auto; /* 右端に配置 */
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #ffc107; /* 黄色 */
+}
+.data-item .edit-button:hover {
+    background-color: #e0a800;
+}
