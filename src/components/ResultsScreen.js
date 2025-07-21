@@ -26,7 +26,7 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
 
   const handleSaveResults = async () => {
     const resultData = {
-      instanceId, // どの調査インスタンスを完了させるか
+      instanceId,
       surveyId: survey.id,
       surveyName: survey.name,
       counts: results,
@@ -65,6 +65,38 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
       alert(e.message);
     }
   };
+
+  // ---【新機能】調査を破棄する処理 ---
+  const handleDiscard = async () => {
+    if (window.confirm('この調査を破棄しますか？この操作は元に戻せません。')) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('認証エラー。再ログインしてください。');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/results/discard`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ instanceId })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || '破棄処理中にエラーが発生しました。');
+            }
+            alert('調査を破棄しました。');
+            onReturnToMain();
+        } catch (e) {
+            console.error("Error discarding survey:", e);
+            alert(e.message);
+        }
+    }
+  };
+
 
   const renderTableRows = (title, category, items) => (
     items.length > 0 && items.map((item, index) => {
@@ -108,7 +140,6 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
         </tfoot>
       </table>
 
-      {/* ---【変更点】isReadOnlyフラグでボタンを切り替え --- */}
       {isReadOnly ? (
         <div className="form-actions">
             <button className="mode-button back-button" onClick={onBack}>集計画面に戻る</button>
@@ -117,7 +148,8 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
         <>
             <div className="form-actions">
                 <button className="mode-button action-button" onClick={handleSaveResults}>今回の結果を保存</button>
-                <button className="mode-button back-button" onClick={onReturnToMain}>調査を破棄</button>
+                {/* ---【変更点】onClickイベントにhandleDiscardを割り当て --- */}
+                <button className="mode-button back-button" onClick={handleDiscard}>調査を破棄</button>
             </div>
             <button className="mode-button" onClick={onBack}>カウント画面に戻る</button>
         </>

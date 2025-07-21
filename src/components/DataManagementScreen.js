@@ -79,7 +79,7 @@ const DataManagementScreen = ({ onBack, onEdit }) => {
             endpoint = '/api/presets';
             break;
         case 'results':
-            endpoint = '/api/results';
+            endpoint = '/api/results'; // ---【変更点】削除用エンドポイントを統一 ---
             break;
         default:
             return;
@@ -112,15 +112,6 @@ const DataManagementScreen = ({ onBack, onEdit }) => {
       }
     }
   };
-
-  const getModeTitle = () => {
-    switch(mode) {
-        case 'surveys': return '調査テンプレート';
-        case 'presets': return 'プリセット';
-        case 'results': return '調査結果';
-        default: return '';
-    }
-  }
 
   return (
     <div className="data-management-container">
@@ -155,7 +146,6 @@ const DataManagementScreen = ({ onBack, onEdit }) => {
             />
             <span className="data-name">{item.name}</span>
             <span className="data-date">作成日: {new Date(item.createdAt).toLocaleDateString()}</span>
-            {/* 調査結果には編集ボタンを表示しない */}
             {mode !== 'results' && 
                 <button className="mode-button edit-button" onClick={() => onEdit(mode, item)}>編集</button>
             }
