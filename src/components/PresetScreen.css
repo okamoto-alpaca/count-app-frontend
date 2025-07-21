@@ -1,0 +1,21 @@
+.list-item.dragging {
+    background-color: #e6f7ff;
+}
+
+.drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    cursor: grab;
+    color: #999;
+}
+
+.drag-handle:hover {
+    color: #333;
+}
+
+.drag-handle-icon {
+    width: 20px;
+    height: 20px;
+}
