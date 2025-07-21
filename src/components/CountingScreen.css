@@ -1,8 +1,9 @@
 .counting-container-fixed-header {
     display: flex;
     flex-direction: column;
-    height: 100%;
     width: 100%;
+    /* ---【変更点】画面の高さいっぱいに広がるように設定 --- */
+    height: calc(100vh - 58px); /* 100vhからapp-headerの高さを引く */
 }
 
 .counting-header-sticky {
@@ -15,7 +16,6 @@
     border-bottom: 1px solid #dee2e6;
 }
 
-/* ---【追加】ヘッダー内のテキストをまとめる --- */
 .header-info {
     text-align: left;
 }

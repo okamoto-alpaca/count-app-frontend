@@ -5,7 +5,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* ---【削除】この行を削除します --- */
+  /* justify-content: center; */
 }
 
 .mode-selection-container {
