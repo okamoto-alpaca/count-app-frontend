@@ -1,8 +1,10 @@
-.counting-container-fixed-header {
+/* ---【変更点】このCSSファイル全体を修正 --- */
+
+.counting-page-container {
+    width: 100%;
+    height: 100vh; /* 画面全体の高さを確保 */
     display: flex;
     flex-direction: column;
-    height: 100vh; /* 画面全体の高さを確保 */
-    width: 100%;
 }
 
 .counting-header-sticky {
@@ -35,7 +37,6 @@
     color: #6c757d;
 }
 
-
 .counting-header-actions {
     display: flex;
     align-items: center;
@@ -61,8 +62,7 @@
 }
 
 .counting-grid-scrollable {
-    flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* スクロールはグリッド部分のみ */
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
@@ -98,7 +98,6 @@
 .incidental-work-button:hover { background-color: #ffc107; color: white; }
 .wasteful-work-button:hover { background-color: #dc3545; color: white; }
 
-/* ---【変更点】フッターを固定しない元のスタイルに戻す --- */
 .counting-footer {
     flex-shrink: 0;
     background-color: #f8f9fa;
@@ -109,7 +108,6 @@
     gap: 20px;
 }
 
-/* ---【追加】ヘッダー内のカメラボタンのスタイル --- */
 .camera-button {
     margin: 0;
     padding: 8px 15px;

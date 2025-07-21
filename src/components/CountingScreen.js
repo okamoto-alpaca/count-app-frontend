@@ -68,7 +68,8 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
   ];
 
   return (
-    <div className="counting-container-fixed-header">
+    // ---【変更点】CSSクラス名を変更 ---
+    <div className="counting-page-container">
       <div className="counting-header-sticky">
         <div className="header-info">
             <h1>調査: {survey.name}</h1>
@@ -93,7 +94,8 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
         </div>
       </div>
 
-      <main className="counting-grid-scrollable">
+      {/* ---【変更点】main要素を削除し、divに変更 --- */}
+      <div className="counting-grid-scrollable">
         {allItems.map((item, index) => {
             const key = `${item.category}-${item.name}`;
             return (
@@ -107,13 +109,12 @@ const CountingScreen = ({ survey, instanceId, onEndSurvey, onBack }) => {
                 </button>
             );
         })}
-      </main>
-
-      {/* ---【変更点】フッターのクラス名を元に戻す --- */}
-      <footer className="counting-footer">
-        <button className="mode-button action-button" onClick={handleEndSurvey}>調査終了</button>
-        <button className="mode-button back-button" onClick={onBack}>調査選択に戻る</button>
-      </footer>
+        {/* ---【変更点】フッターをスクロール部分の末尾に移動 --- */}
+        <footer className="counting-footer">
+            <button className="mode-button action-button" onClick={handleEndSurvey}>調査終了</button>
+            <button className="mode-button back-button" onClick={onBack}>調査選択に戻る</button>
+        </footer>
+      </div>
     </div>
   );
 };
