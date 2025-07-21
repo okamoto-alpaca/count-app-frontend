@@ -118,19 +118,6 @@ function App() {
     setCurrentScreen('results');
   };
 
-  const handleCameraClick = () => {
-    document.getElementById('camera-input').click();
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        console.log('撮影したファイル:', file);
-        alert(`写真「${file.name}」が選択されました。（アップロード機能は未実装です）`);
-    }
-  };
-
-
   const renderScreen = () => {
     switch (currentScreen) {
       case 'register':
@@ -169,29 +156,9 @@ function App() {
     return <LoginScreen onLogin={handleLogin} error={loginError} />;
   }
 
-  // ---【変更点】Appコンポーネントの構造を変更 ---
   return (
-    <div className="app-container">
-       <header className="app-header">
-         <span className="user-info">ようこそ {user.name}さん ({user.role})</span>
-         <div className="header-actions">
-            {/* 調査画面でのみカメラボタンを表示 */}
-            {currentScreen === 'counting' && (
-                <button className="mode-button camera-button" onClick={handleCameraClick}>カメラ</button>
-            )}
-            <input 
-                type="file" 
-                id="camera-input" 
-                accept="image/*" 
-                capture="environment" 
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-            />
-         </div>
-       </header>
-       <main className="app-main">
-        {renderScreen()}
-       </main>
+    <div className="App">
+      {renderScreen()}
     </div>
   );
 }

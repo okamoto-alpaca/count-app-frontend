@@ -249,8 +249,6 @@
   font-weight: bold;
 }
 
-/* ---【ここから変更】--- */
-
 .real-work-button { border-color: #007bff; color: #007bff; background-color: #e7f3ff; }
 .incidental-work-button { border-color: #ffc107; color: #b88a00; background-color: #fff8e1; }
 .wasteful-work-button { border-color: #dc3545; color: #dc3545; background-color: #fdecea; }
@@ -541,23 +539,6 @@
   margin-top: 10px;
 }
 
-.app-header {
-  width: 100%;
-  padding: 10px 20px;
-  background-color: #333;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-sizing: border-box;
-}
-
-.app-header .back-button {
-  margin: 0;
-  padding: 8px 15px;
-  font-size: 14px;
-}
-
 .data-item .edit-button {
     margin-left: auto;
     padding: 8px 12px;
@@ -583,48 +564,4 @@
     background-color: #4caf50;
     color: white;
     width: 100%;
-}
-
-/* この部分をApp.cssの一番下に追加 */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.app-header {
-  flex-shrink: 0; /* ヘッダーが縮まないようにする */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #333;
-  color: white;
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.camera-button {
-    margin: 0;
-    padding: 8px 15px;
-    font-size: 14px;
-    background-color: #00aaff;
-}
-
-.app-main {
-  flex-grow: 1; /* メインコンテンツが残りの高さをすべて使う */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* App.js直下の .App クラスは不要になるため削除または修正 */
-.App {
-  /* このクラスの justify-content や align-items は app-main に移譲 */
-  width: 100%;
 }
