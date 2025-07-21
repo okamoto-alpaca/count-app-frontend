@@ -1,10 +1,13 @@
 import React from 'react';
 
-const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onReturnToMain }) => {
+const ResultsScreen = ({ survey, resultData, isReadOnly, onBack, onReturnToMain }) => {
+  const counts = resultData.counts; // countsオブジェクトを取り出す
+  const instanceId = resultData.instanceId; // instanceIdを取り出す
+
   const getSubtotal = (category, items) => {
     return items.reduce((sum, item) => {
         const key = `${category}-${item}`;
-        return sum + (results[key] || 0);
+        return sum + (counts[key] || 0);
     }, 0);
   };
 
@@ -25,11 +28,11 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
   const rank = getEvaluationRank(discoveryRate);
 
   const handleSaveResults = async () => {
-    const resultData = {
-      instanceId,
+    const payload = {
+      instanceId, // ここで正しいinstanceIdが使われる
       surveyId: survey.id,
       surveyName: survey.name,
-      counts: results,
+      counts: counts,
       totalCount: total,
       discoveryRate: discoveryRate,
       rank: rank,
@@ -44,18 +47,12 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/results`, {
           method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(resultData)
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify(payload)
       });
       
       const data = await response.json();
-
-      if (!response.ok) {
-          throw new Error(data.message || '保存中にエラーが発生しました。');
-      }
+      if (!response.ok) throw new Error(data.message || '保存中にエラーが発生しました。');
 
       alert('調査結果を保存しました。');
       onReturnToMain();
@@ -73,20 +70,14 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
             alert('認証エラー。再ログインしてください。');
             return;
         }
-
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/results/discard`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ instanceId })
             });
             const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || '破棄処理中にエラーが発生しました。');
-            }
+            if (!response.ok) throw new Error(data.message || '破棄処理中にエラーが発生しました。');
             alert('調査を破棄しました。');
             onReturnToMain();
         } catch (e) {
@@ -96,11 +87,10 @@ const ResultsScreen = ({ survey, results, instanceId, isReadOnly, onBack, onRetu
     }
   };
 
-
   const renderTableRows = (title, category, items) => (
     items.length > 0 && items.map((item, index) => {
       const key = `${category}-${item}`;
-      const count = results[key] || 0;
+      const count = counts[key] || 0;
       return (
         <tr key={`${category}-${index}`}>
           {index === 0 && <td rowSpan={items.length}>{title}</td>}

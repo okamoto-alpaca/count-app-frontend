@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, 'useState', useEffect } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import './App.css';
 
@@ -88,10 +88,9 @@ function App() {
     const surveyTemplate = surveys.find(s => s.id === result.surveyId);
     if (surveyTemplate) {
         setSelectedSurvey(surveyTemplate);
-        setSurveyResults(result.counts);
+        // ---【変更点】countsだけでなく、result全体を渡す ---
+        setSurveyResults(result); 
         setIsResultReadOnly(true);
-        // ---【追加】表示する調査結果のインスタンスIDもセット ---
-        setActiveInstanceId(result.id); 
         setCurrentScreen('results');
     } else {
         alert("元の調査テンプレートが見つかりませんでした。");
@@ -114,10 +113,13 @@ function App() {
     setCurrentScreen('counting');
   };
   
+  // ---【変更点】渡すデータの構造を変更 ---
   const handleEndSurvey = (counts) => {
-    setSurveyResults(counts);
+    setSurveyResults({
+        counts: counts,
+        instanceId: activeInstanceId // この時点でのinstanceIdを一緒に保存
+    });
     setIsResultReadOnly(false);
-    // activeInstanceIdは既にセットされているので変更不要
     setCurrentScreen('results');
   };
 
@@ -135,19 +137,14 @@ function App() {
       case 'results':
         return <ResultsScreen 
                     survey={selectedSurvey} 
-                    results={surveyResults}
-                    instanceId={activeInstanceId}
+                    resultData={surveyResults} // ---【変更点】名前をresultDataに変更 ---
                     isReadOnly={isResultReadOnly}
                     onBack={() => {
-                        // ---【変更点】戻る際に不要なstateをクリア ---
                         setIsResultReadOnly(false);
-                        setActiveInstanceId(null);
-                        const targetScreen = isResultReadOnly ? 'summary' : 'counting';
-                        setCurrentScreen(targetScreen);
+                        setCurrentScreen(isResultReadOnly ? 'summary' : 'counting');
                     }} 
                     onReturnToMain={() => {
                         setIsResultReadOnly(false);
-                        setActiveInstanceId(null);
                         setCurrentScreen('main');
                     }}
                 />;
@@ -172,6 +169,9 @@ function App() {
 
   return (
     <div className="App">
+       <header className="app-header">
+         <span>ようこそ {user.name}さん ({user.role})</span>
+       </header>
       {renderScreen()}
     </div>
   );
