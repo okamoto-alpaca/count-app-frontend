@@ -11,6 +11,7 @@ import ResultsScreen from './components/ResultsScreen';
 import SummaryScreen from './components/SummaryScreen';
 import DataManagementScreen from './components/DataManagementScreen';
 import PresetScreen from './components/PresetScreen';
+import UserManagementScreen from './components/UserManagementScreen'; // ---【追加】---
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -23,7 +24,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
   const [activeInstanceId, setActiveInstanceId] = useState(null);
-  const [isResultReadOnly, setIsResultReadOnly] = useState(false); // ---【追加】---
+  const [isResultReadOnly, setIsResultReadOnly] = useState(false);
 
 
   useEffect(() => {
@@ -83,13 +84,12 @@ function App() {
     setCurrentScreen('main');
   };
   
-  // ---【変更点】集計画面からの遷移時にフラグを立てる ---
   const handleShowResults = (result, surveys) => {
     const surveyTemplate = surveys.find(s => s.id === result.surveyId);
     if (surveyTemplate) {
         setSelectedSurvey(surveyTemplate);
         setSurveyResults(result.counts);
-        setIsResultReadOnly(true); // 読み取り専用フラグを立てる
+        setIsResultReadOnly(true);
         setCurrentScreen('results');
     } else {
         alert("元の調査テンプレートが見つかりませんでした。");
@@ -112,10 +112,9 @@ function App() {
     setCurrentScreen('counting');
   };
   
-  // ---【追加】カウント画面から結果画面への遷移処理 ---
   const handleEndSurvey = (counts) => {
     setSurveyResults(counts);
-    setIsResultReadOnly(false); // 読み取り専用ではない
+    setIsResultReadOnly(false);
     setCurrentScreen('results');
   };
 
@@ -134,8 +133,8 @@ function App() {
         return <ResultsScreen 
                     survey={selectedSurvey} 
                     results={surveyResults}
-                    instanceId={activeInstanceId} // 保存時に必要
-                    isReadOnly={isResultReadOnly} // 読み取り専用かどうかのフラグ
+                    instanceId={activeInstanceId}
+                    isReadOnly={isResultReadOnly}
                     onBack={() => isResultReadOnly ? setCurrentScreen('summary') : setCurrentScreen('counting')} 
                     onReturnToMain={() => setCurrentScreen('main')} 
                 />;
@@ -143,6 +142,8 @@ function App() {
         return <SummaryScreen onBack={() => setCurrentScreen('main')} onShowResults={handleShowResults} />;
       case 'data_management':
         return <DataManagementScreen onBack={() => setCurrentScreen('main')} onEdit={handleEdit} />;
+      case 'user_management': // ---【追加】---
+        return <UserManagementScreen onBack={() => setCurrentScreen('main')} />;
       default:
         return <MainMenu onNavigate={setCurrentScreen} user={user} onLogout={handleLogout} />;
     }

@@ -10,7 +10,6 @@ const MainMenu = ({ onNavigate, user, onLogout }) => {
             {hasAdminRights && (
                 <>
                     <button className="mode-button" onClick={() => onNavigate('register')}>登録</button>
-                    {/* ---【追加】--- */}
                     <button className="mode-button" onClick={() => onNavigate('preset')}>プリセット登録</button>
                 </>
             )}
@@ -21,6 +20,8 @@ const MainMenu = ({ onNavigate, user, onLogout }) => {
                 <>
                     <button className="mode-button" onClick={() => onNavigate('summary')}>集計</button>
                     <button className="mode-button" onClick={() => onNavigate('data_management')}>データ管理</button>
+                    {/* ---【追加】--- */}
+                    <button className="mode-button" onClick={() => onNavigate('user_management')}>ユーザー管理</button>
                 </>
             )}
 
