@@ -1,46 +1,61 @@
 import React, { useState, useEffect } from 'react';
 
 const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
-  const [surveys, setSurveys] = useState([]);
-
+  const [surveyTemplates, setSurveyTemplates] = useState([]);
+  const [inProgressSurveys, setInProgressSurveys] = useState([]);
+  
+  // 調査テンプレートと進行中の調査の両方を取得する
   useEffect(() => {
-    const fetchSurveys = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('認証エラー。再ログインしてください。');
-        return;
-      }
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    // テンプレート一覧を取得
+    const fetchTemplates = async () => {
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/surveys`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.message || '調査リストの取得に失敗しました。');
-        }
-        const surveyList = await response.json();
-        setSurveys(surveyList);
+        const data = await response.json();
+        if (response.ok) setSurveyTemplates(data);
       } catch (error) {
-        console.error("Error fetching surveys: ", error);
-        alert(error.message);
+        console.error("Error fetching survey templates: ", error);
       }
     };
-    fetchSurveys();
-  }, []);
 
-  // ---【変更点】調査インスタンスを作成する処理を追加 ---
-  const handleSelect = async (surveyTemplate) => {
+    // 進行中の調査を取得
+    const fetchInProgress = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/survey-instances/in-progress`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                // テンプレート名を追加情報として結合しておく
+                const populatedInstances = data.map(instance => {
+                    const template = surveyTemplates.find(t => t.id === instance.surveyTemplateId);
+                    return { ...instance, name: template ? template.name : '不明な調査' };
+                });
+                setInProgressSurveys(populatedInstances);
+            }
+        } catch (error) {
+            console.error("Error fetching in-progress surveys: ", error);
+        }
+    };
+
+    // テンプレートを先に取得し、その後で進行中の調査を取得
+    fetchTemplates().then(fetchInProgress);
+
+  }, [surveyTemplates]); // surveyTemplatesが更新された後、再実行
+
+
+  const handleStartNew = async (surveyTemplate) => {
     const token = localStorage.getItem('token');
     if (!token) {
         alert('認証エラー。再ログインしてください。');
         return;
     }
 
-    if (window.confirm(`「${surveyTemplate.name}」の調査を開始しますか？`)) {
+    if (window.confirm(`「${surveyTemplate.name}」の調査を新しく開始しますか？`)) {
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/survey-instances`, {
                 method: 'POST',
@@ -55,10 +70,7 @@ const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
             if (!response.ok) {
                 throw new Error(data.message || '調査の開始に失敗しました。');
             }
-
-            // 成功したら、テンプレート情報と新しいインスタンスIDを渡して画面遷移
             onSelectSurvey(surveyTemplate, data.instanceId);
-
         } catch (error) {
             console.error("Error starting survey instance:", error);
             alert(error.message);
@@ -66,13 +78,34 @@ const SurveySelectionScreen = ({ onBack, onSelectSurvey }) => {
     }
   };
 
+  const handleResume = (instance) => {
+    const template = surveyTemplates.find(t => t.id === instance.surveyTemplateId);
+    if (template) {
+        onSelectSurvey(template, instance.id);
+    } else {
+        alert('元の調査テンプレートが見つかりませんでした。');
+    }
+  };
+
 
   return (
     <div className="screen-container">
-      <h1>調査を選択</h1>
+      {/* ---【追加】進行中の調査があれば表示 --- */}
+      {inProgressSurveys.length > 0 && (
+        <div className="in-progress-section">
+            <h2>進行中の調査</h2>
+            {inProgressSurveys.map(instance => (
+                <button key={instance.id} className="survey-select-button resume-button" onClick={() => handleResume(instance)}>
+                    {instance.name} を再開する
+                </button>
+            ))}
+        </div>
+      )}
+
+      <h1>新しく調査を開始</h1>
       <div className="survey-grid">
-        {surveys.map(survey => (
-          <button key={survey.id} className="survey-select-button" onClick={() => handleSelect(survey)}>
+        {surveyTemplates.map(survey => (
+          <button key={survey.id} className="survey-select-button" onClick={() => handleStartNew(survey)}>
             {survey.name}
           </button>
         ))}

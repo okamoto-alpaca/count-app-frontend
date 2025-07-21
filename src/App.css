@@ -662,3 +662,21 @@
 .data-item .edit-button:hover {
     background-color: #e0a800;
 }
+
+/* この部分をApp.cssの一番下に追加 */
+.in-progress-section {
+    width: 80%;
+    max-width: 400px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+.in-progress-section h2 {
+    text-align: center;
+    color: #555;
+}
+.resume-button {
+    background-color: #4caf50; /* 緑 */
+    color: white;
+    width: 100%;
+}
