@@ -1,0 +1,61 @@
+.counting-header-single-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.counting-header-single-line h1,
+.counting-header-single-line h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.minus-mode-button {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 5px 15px;
+    border-radius: 8px;
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.minus-mode-button.active {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.counting-grid {
+    display: grid;
+    /* 5列のグリッドを作成 */
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 20px;
+}
+
+.grid-item-button {
+    padding: 15px 5px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 2px solid;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.2s;
+    word-break: break-all; /* 長い単語を折り返す */
+    min-height: 80px;
+}
+
+.grid-item-button .count-number {
+    font-size: 20px;
+}
