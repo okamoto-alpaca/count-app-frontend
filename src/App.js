@@ -10,6 +10,7 @@ import CountingScreen from './components/CountingScreen';
 import ResultsScreen from './components/ResultsScreen';
 import SummaryScreen from './components/SummaryScreen';
 import DataManagementScreen from './components/DataManagementScreen';
+import PresetScreen from './components/PresetScreen'; // ---【追加】---
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -93,6 +94,8 @@ function App() {
     switch (currentScreen) {
       case 'register':
         return <RegisterScreen onBack={() => setCurrentScreen('main')} />;
+      case 'preset': // ---【追加】---
+        return <PresetScreen onBack={() => setCurrentScreen('main')} />;
       case 'survey':
         return <SurveySelectionScreen onBack={() => setCurrentScreen('main')} onSelectSurvey={(survey) => { setSelectedSurvey(survey); setCurrentScreen('counting'); }} />;
       case 'counting':
@@ -104,7 +107,6 @@ function App() {
       case 'data_management':
         return <DataManagementScreen onBack={() => setCurrentScreen('main')} />;
       default:
-        // ---【変更点】MainMenuにonLogoutを渡す ---
         return <MainMenu onNavigate={setCurrentScreen} user={user} onLogout={handleLogout} />;
     }
   };
@@ -120,7 +122,6 @@ function App() {
   return (
     <div className="App">
        <header className="app-header">
-         {/* ---【変更点】ログアウトボタンを削除 --- */}
          <span>ようこそ {user.name}さん ({user.role})</span>
        </header>
       {renderScreen()}
