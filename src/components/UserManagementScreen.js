@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import './UserManagementScreen.css'; // CSSをインポート
+import './UserManagementScreen.css';
 
-// ユーザー作成・編集用のモーダルコンポーネント
-const UserModal = ({ user, onSave, onClose }) => {
+const UserModal = ({ user, currentUser, onSave, onClose }) => { // ---【変更点】currentUserを受け取る
     const [formData, setFormData] = useState({
         name: user ? user.name : '',
         userId: user ? user.userId : '',
         password: '',
         role: user ? user.role : 'user',
+        companyCode: user ? user.companyCode : '', // ---【追加】---
     });
 
     const handleChange = (e) => {
@@ -21,6 +21,7 @@ const UserModal = ({ user, onSave, onClose }) => {
     };
     
     const isEditing = !!user;
+    const isSuper = currentUser.role === 'super'; // ---【追加】---
 
     return (
         <div className="modal-backdrop">
@@ -33,6 +34,10 @@ const UserModal = ({ user, onSave, onClose }) => {
                     <option value="user">使用者</option>
                     <option value="master">マスター</option>
                 </select>
+                {/* ---【追加】superユーザーの場合のみ企業コード入力欄を表示 --- */}
+                {isSuper && (
+                    <input type="text" name="companyCode" value={formData.companyCode} onChange={handleChange} placeholder="企業コード" required />
+                )}
                 <div className="form-actions">
                     <button type="submit" className="mode-button action-button">{isEditing ? '更新' : '作成'}</button>
                     <button type="button" className="mode-button back-button" onClick={onClose}>キャンセル</button>
@@ -43,7 +48,7 @@ const UserModal = ({ user, onSave, onClose }) => {
 };
 
 
-const UserManagementScreen = ({ onBack }) => {
+const UserManagementScreen = ({ onBack, user }) => { // ---【変更点】userを受け取る
     const [users, setUsers] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,7 +96,7 @@ const UserManagementScreen = ({ onBack }) => {
             alert(data.message);
             setIsModalOpen(false);
             setEditingUser(null);
-            fetchUsers(); // リストを更新
+            fetchUsers();
         } catch (error) {
             alert(error.message);
         }
@@ -113,7 +118,7 @@ const UserManagementScreen = ({ onBack }) => {
             
             alert(data.message);
             setSelectedIds([]);
-            fetchUsers(); // リストを更新
+            fetchUsers();
         } catch (error) {
             alert(error.message);
         }
@@ -121,19 +126,21 @@ const UserManagementScreen = ({ onBack }) => {
 
     return (
         <>
-            {isModalOpen && <UserModal user={editingUser} onSave={handleSaveUser} onClose={() => { setIsModalOpen(false); setEditingUser(null); }} />}
+            {isModalOpen && <UserModal user={editingUser} currentUser={user} onSave={handleSaveUser} onClose={() => { setIsModalOpen(false); setEditingUser(null); }} />}
             <div className="data-management-container">
                 <div className="user-management-header">
                     <h1>ユーザー管理</h1>
                     <button className="mode-button action-button" onClick={() => { setEditingUser(null); setIsModalOpen(true); }}>新規作成</button>
                 </div>
                 <div className="data-list">
-                    {users.map(user => (
-                        <div key={user.id} className="data-item">
-                            <input type="checkbox" checked={selectedIds.includes(user.id)} onChange={() => handleCheckboxChange(user.id)} />
-                            <span className="data-name">{user.name} ({user.userId})</span>
-                            <span className="data-date">役割: {user.role}</span>
-                            <button className="mode-button edit-button" onClick={() => { setEditingUser(user); setIsModalOpen(true); }}>編集</button>
+                    {users.map(u => (
+                        <div key={u.id} className="data-item">
+                            <input type="checkbox" checked={selectedIds.includes(u.id)} onChange={() => handleCheckboxChange(u.id)} />
+                            <span className="data-name">{u.name} ({u.userId})</span>
+                            {/* ---【追加】superユーザーの場合のみ企業コードを表示 --- */}
+                            {user.role === 'super' && <span className="data-company-code">企業コード: {u.companyCode}</span>}
+                            <span className="data-date">役割: {u.role}</span>
+                            <button className="mode-button edit-button" onClick={() => { setEditingUser(u); setIsModalOpen(true); }}>編集</button>
                         </div>
                     ))}
                 </div>

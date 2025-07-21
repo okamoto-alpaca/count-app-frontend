@@ -680,3 +680,10 @@
     color: white;
     width: 100%;
 }
+
+/* この部分をApp.cssの一番下に追加 */
+.data-item .data-company-code {
+    margin-left: 15px;
+    font-size: 14px;
+    color: #888;
+}
