@@ -62,7 +62,25 @@
   border-color: #00aaff;
 }
 
-/* ---【追加】ドラッグ中のアイテムのスタイル --- */
 .list-item.dragging {
-    background-color: #e6f7ff; /* 明るい青色 */
+    background-color: #e6f7ff;
+}
+
+/* ---【追加】ここから下を追加 --- */
+.drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    cursor: grab;
+    color: #999;
+}
+
+.drag-handle:hover {
+    color: #333;
+}
+
+.drag-handle-icon {
+    width: 20px;
+    height: 20px;
 }

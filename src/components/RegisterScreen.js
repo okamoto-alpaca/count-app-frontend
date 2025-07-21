@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'; // ---【追加】---
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import './RegisterScreen.css';
+
+// ---【追加】ドラッグハンドル用のアイコン ---
+const DragHandle = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="drag-handle-icon">
+        <path d="M7 10H5C4.44772 10 4 9.55228 4 9V7C4 6.44772 4.44772 6 5 6H7C7.55228 6 8 6.44772 8 7V9C8 9.55228 7.55228 10 7 10Z" fill="currentColor"/>
+        <path d="M14 10H12C11.4477 10 11 9.55228 11 9V7C11 6.44772 11.4477 6 12 6H14C14.5523 6 15 6.44772 15 7V9C15 9.55228 14.5523 10 14 10Z" fill="currentColor"/>
+        <path d="M21 10H19C18.4477 10 18 9.55228 18 9V7C18 6.44772 18.4477 6 19 6H21C21.5523 6 22 6.44772 22 7V9C22 9.55228 21.5523 10 21 10Z" fill="currentColor"/>
+        <path d="M7 17H5C4.44772 17 4 16.5523 4 16V14C4 13.4477 4.44772 13 5 13H7C7.55228 13 8 13.4477 8 14V16C8 16.5523 7.55228 17 7 17Z" fill="currentColor"/>
+        <path d="M14 17H12C11.4477 17 11 16.5523 11 16V14C11 13.4477 11.4477 13 12 13H14C14.5523 13 15 13.4477 15 14V16C15 16.5523 14.5523 17 14 17Z" fill="currentColor"/>
+        <path d="M21 17H19C18.4477 17 18 16.5523 18 16V14C18 13.4477 18.4477 13 19 13H21C21.5523 13 22 13.4477 22 14V16C22 16.5523 21.5523 17 21 17Z" fill="currentColor"/>
+    </svg>
+);
+
 
 const PresetModal = ({ presets, onSelect, onClose }) => (
     <div className="modal-backdrop">
@@ -119,7 +132,6 @@ const RegisterScreen = ({ onBack }) => {
     }
   };
   
-  // ---【追加】ドラッグ終了時の処理 ---
   const onDragEnd = (result, items, setItems) => {
     if (!result.destination) return;
     const newItems = Array.from(items);
@@ -131,7 +143,6 @@ const RegisterScreen = ({ onBack }) => {
   const renderWorkCategory = (title, items, setItems, placeholder, className, droppableId) => (
     <div className={`work-category-box ${className}`}>
       <h2>{title}</h2>
-      {/* ---【変更点】ドラッグ＆ドロップのコンテキストでリストを囲む --- */}
       <DragDropContext onDragEnd={(result) => onDragEnd(result, items, setItems)}>
         <Droppable droppableId={droppableId}>
           {(provided) => (
@@ -142,9 +153,12 @@ const RegisterScreen = ({ onBack }) => {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      {...provided.dragHandleProps}
                       className={`list-item ${snapshot.isDragging ? 'dragging' : ''}`}
                     >
+                      {/* ---【変更点】ドラッグハンドルをここに配置し、ドラッグ用のpropsを渡す --- */}
+                      <div {...provided.dragHandleProps} className="drag-handle">
+                        <DragHandle />
+                      </div>
                       <input
                         type="text"
                         placeholder={placeholder}
@@ -180,7 +194,6 @@ const RegisterScreen = ({ onBack }) => {
           <input type="text" placeholder="調査名 No" className="form-input" value={surveyNo} onChange={(e) => setSurveyNo(e.target.value)} />
           <input type="text" placeholder="調査名" className="form-input" value={surveyName} onChange={(e) => setSurveyName(e.target.value)} />
         </div>
-        {/* ---【変更点】Droppable IDを渡す --- */}
         {renderWorkCategory('実作業', realWorkItems, setRealWorkItems, '実作業 項目', 'real-work', 'realWork')}
         {renderWorkCategory('付随作業', incidentalWorkItems, setIncidentalWorkItems, '付随作業 項目', 'incidental-work', 'incidentalWork')}
         {renderWorkCategory('ムダ作業', wastefulWorkItems, setWastefulWorkItems, 'ムダ作業 項目', 'wasteful-work', 'wastefulWork')}
