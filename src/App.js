@@ -1,4 +1,4 @@
-import React, 'useState', useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import './App.css';
 
@@ -88,7 +88,6 @@ function App() {
     const surveyTemplate = surveys.find(s => s.id === result.surveyId);
     if (surveyTemplate) {
         setSelectedSurvey(surveyTemplate);
-        // ---【変更点】countsだけでなく、result全体を渡す ---
         setSurveyResults(result); 
         setIsResultReadOnly(true);
         setCurrentScreen('results');
@@ -113,11 +112,10 @@ function App() {
     setCurrentScreen('counting');
   };
   
-  // ---【変更点】渡すデータの構造を変更 ---
   const handleEndSurvey = (counts) => {
     setSurveyResults({
         counts: counts,
-        instanceId: activeInstanceId // この時点でのinstanceIdを一緒に保存
+        instanceId: activeInstanceId
     });
     setIsResultReadOnly(false);
     setCurrentScreen('results');
@@ -137,7 +135,7 @@ function App() {
       case 'results':
         return <ResultsScreen 
                     survey={selectedSurvey} 
-                    resultData={surveyResults} // ---【変更点】名前をresultDataに変更 ---
+                    resultData={surveyResults}
                     isReadOnly={isResultReadOnly}
                     onBack={() => {
                         setIsResultReadOnly(false);
@@ -169,9 +167,6 @@ function App() {
 
   return (
     <div className="App">
-       <header className="app-header">
-         <span>ようこそ {user.name}さん ({user.role})</span>
-       </header>
       {renderScreen()}
     </div>
   );
