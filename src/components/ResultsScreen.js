@@ -1,10 +1,18 @@
 import React from 'react';
 
 const ResultsScreen = ({ survey, results, onBack, onReturnToMain }) => {
-  const getSubtotal = (items) => items.reduce((sum, item) => sum + (results[item] || 0), 0);
-  const realWorkSubtotal = getSubtotal(survey.realWork);
-  const incidentalWorkSubtotal = getSubtotal(survey.incidentalWork);
-  const wastefulWorkSubtotal = getSubtotal(survey.wastefulWork);
+  // ---【変更点】カテゴリプレフィックスを考慮した集計関数 ---
+  const getSubtotal = (category, items) => {
+    return items.reduce((sum, item) => {
+        const key = `${category}-${item}`;
+        return sum + (results[key] || 0);
+    }, 0);
+  };
+
+  const realWorkSubtotal = getSubtotal('real', survey.realWork);
+  const incidentalWorkSubtotal = getSubtotal('incidental', survey.incidentalWork);
+  const wastefulWorkSubtotal = getSubtotal('wasteful', survey.wastefulWork);
+  
   const total = realWorkSubtotal + incidentalWorkSubtotal + wastefulWorkSubtotal;
   const discoveryRate = total > 0 ? (((realWorkSubtotal * 0) + (incidentalWorkSubtotal * 0.2) + (wastefulWorkSubtotal * 0.5)) / total) * 100 : 0;
 
@@ -58,15 +66,20 @@ const ResultsScreen = ({ survey, results, onBack, onReturnToMain }) => {
     }
   };
 
-  const renderTableRows = (title, items) => (
-    items.length > 0 && items.map((item, index) => (
-      <tr key={`${title}-${index}`}>
-        {index === 0 && <td rowSpan={items.length}>{title}</td>}
-        <td>{item}</td>
-        <td>{results[item] || 0}</td>
-        <td>{total > 0 ? (((results[item] || 0) / total) * 100).toFixed(1) : 0}%</td>
-      </tr>
-    ))
+  // ---【変更点】カテゴリプレフィックスを考慮した行レンダリング関数 ---
+  const renderTableRows = (title, category, items) => (
+    items.length > 0 && items.map((item, index) => {
+      const key = `${category}-${item}`;
+      const count = results[key] || 0;
+      return (
+        <tr key={`${category}-${index}`}>
+          {index === 0 && <td rowSpan={items.length}>{title}</td>}
+          <td>{item}</td>
+          <td>{count}</td>
+          <td>{total > 0 ? ((count / total) * 100).toFixed(1) : 0}%</td>
+        </tr>
+      );
+    })
   );
 
   return (
@@ -87,9 +100,9 @@ const ResultsScreen = ({ survey, results, onBack, onReturnToMain }) => {
           <tr><th>大分類</th><th>作業項目</th><th>カウント</th><th>構成比</th></tr>
         </thead>
         <tbody>
-          {renderTableRows('実作業', survey.realWork)}
-          {renderTableRows('付随作業', survey.incidentalWork)}
-          {renderTableRows('ムダ作業', survey.wastefulWork)}
+          {renderTableRows('実作業', 'real', survey.realWork)}
+          {renderTableRows('付随作業', 'incidental', survey.incidentalWork)}
+          {renderTableRows('ムダ作業', 'wasteful', survey.wastefulWork)}
         </tbody>
         <tfoot>
           <tr><th colSpan="2">合計</th><th>{total}</th><th>100.0%</th></tr>

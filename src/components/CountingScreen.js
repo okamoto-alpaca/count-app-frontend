@@ -4,19 +4,36 @@ const CountingScreen = ({ survey, onEndSurvey, onBack }) => {
   const [counts, setCounts] = useState({});
   const [totalCount, setTotalCount] = useState(0);
 
+  // ---【変更点】初期化処理を修正 ---
   useEffect(() => {
     const initialCounts = {};
-    const allItems = [...survey.realWork, ...survey.incidentalWork, ...survey.wastefulWork];
-    allItems.forEach(item => {
-      initialCounts[item] = 0;
-    });
+    // 各カテゴリの項目に、カテゴリ名をプレフィックスとして付けて一意なキーを作成
+    survey.realWork.forEach(item => { initialCounts[`real-${item}`] = 0; });
+    survey.incidentalWork.forEach(item => { initialCounts[`incidental-${item}`] = 0; });
+    survey.wastefulWork.forEach(item => { initialCounts[`wasteful-${item}`] = 0; });
+    
     setCounts(initialCounts);
     setTotalCount(0);
   }, [survey]);
 
-  const handleCount = (item) => {
-    setCounts(prevCounts => ({ ...prevCounts, [item]: prevCounts[item] + 1 }));
+  // ---【変更点】カウント処理のキーを一意なものに変更 ---
+  const handleCount = (category, item) => {
+    const key = `${category}-${item}`; // 'real-手作業' のような一意なキーを生成
+    setCounts(prevCounts => ({ ...prevCounts, [key]: prevCounts[key] + 1 }));
     setTotalCount(prevTotal => prevTotal + 1);
+  };
+
+  // ---【追加】各カテゴリのボタンをレンダリングするヘルパー関数 ---
+  const renderCountButtons = (category, items, buttonClass) => {
+    return items.map((item, index) => {
+        const key = `${category}-${item}`;
+        return (
+            <button key={index} className={`count-button ${buttonClass}`} onClick={() => handleCount(category, item)}>
+                {item}
+                <span className="count-number">{counts[key] || 0}</span>
+            </button>
+        );
+    });
   };
 
   return (
@@ -29,31 +46,20 @@ const CountingScreen = ({ survey, onEndSurvey, onBack }) => {
         <section className="count-category">
           <h3 className="real-work-header">実作業</h3>
           <div className="count-grid">
-            {survey.realWork.map((item, index) => (
-              <button key={index} className="count-button real-work-button" onClick={() => handleCount(item)}>
-                {item}<span className="count-number">{counts[item] || 0}</span>
-              </button>
-            ))}
+            {/* ---【変更点】ヘルパー関数を使ってボタンを表示 --- */}
+            {renderCountButtons('real', survey.realWork, 'real-work-button')}
           </div>
         </section>
         <section className="count-category">
           <h3 className="incidental-work-header">付随作業</h3>
           <div className="count-grid">
-            {survey.incidentalWork.map((item, index) => (
-              <button key={index} className="count-button incidental-work-button" onClick={() => handleCount(item)}>
-                {item}<span className="count-number">{counts[item] || 0}</span>
-              </button>
-            ))}
+            {renderCountButtons('incidental', survey.incidentalWork, 'incidental-work-button')}
           </div>
         </section>
         <section className="count-category">
           <h3 className="wasteful-work-header">ムダ作業</h3>
           <div className="count-grid">
-            {survey.wastefulWork.map((item, index) => (
-              <button key={index} className="count-button wasteful-work-button" onClick={() => handleCount(item)}>
-                {item}<span className="count-number">{counts[item] || 0}</span>
-              </button>
-            ))}
+            {renderCountButtons('wasteful', survey.wastefulWork, 'wasteful-work-button')}
           </div>
         </section>
       </main>
