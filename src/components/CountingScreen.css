@@ -1,8 +1,6 @@
-/* ---【変更点】このCSSファイル全体を修正 --- */
-
 .counting-page-container {
     width: 100%;
-    height: 100vh; /* 画面全体の高さを確保 */
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -62,7 +60,8 @@
 }
 
 .counting-grid-scrollable {
-    overflow-y: auto; /* スクロールはグリッド部分のみ */
+    flex-grow: 1; /* ---【変更点】高さを可変にする --- */
+    overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
